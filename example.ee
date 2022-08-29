@@ -12,3 +12,7 @@ if argc equal_to 1 =
   print(arg_1 + " seems not in this directory\n");
  ;
 ;
+
+exit();
+
+print("hmmmm\n");

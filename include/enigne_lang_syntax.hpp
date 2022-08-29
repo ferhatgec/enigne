@@ -85,6 +85,7 @@ public:
         IsFile, // is_file
         IsSymlink, // is_symlink
         ReadFile, // read_file
+        Exit, // exit
 Undefined = -1
     };
 
@@ -189,7 +190,8 @@ Undefined = -1
             IMPL_TOKEN("is_dir", this->IsDir),
             IMPL_TOKEN("is_file", this->IsFile),
             IMPL_TOKEN("is_symlink", this->IsSymlink),
-            IMPL_TOKEN("read_file", this->ReadFile)
+            IMPL_TOKEN("read_file", this->ReadFile),
+            IMPL_TOKEN("exit", this->Exit)
     };
 
     std::string raw_file_data;

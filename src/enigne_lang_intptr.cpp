@@ -229,6 +229,11 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             
             return enignelang_system::output(val);
         }
+    } else if(expr->node_type == enignelang_syntax::Exit) {
+        if(expr->other.empty())
+            std::exit(1);
+        
+        std::exit(0);
     }
 
     return "";
@@ -867,6 +872,13 @@ void enignelang_intptr::walk(enignelang_ast* node,
             }
 
             break;
+        }
+
+        case enignelang_syntax::Exit: {
+            if(node->other.empty())
+                std::exit(1);
+            
+            std::exit(0);
         }
         
         case enignelang_syntax::Variant: {
