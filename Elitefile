@@ -1,0 +1,26 @@
+required_version is 0.1
+
+set bin_path as      "/usr/bin/"
+set output   as      "{bin_path}enigne"
+
+set sudo     as      "sudo"
+set compiler as      "c++"
+set standard as std  "c++20"
+set flag/s   as link "stdc++fs"
+
+
+for signal "start" [
+    set pre as "src/enigne_lang"
+    set mod as "src/modules/enigne_lang"
+    set files as "{mod}_system.cpp {mod}_fs.cpp {pre}_ast.cpp {pre}_intptr.cpp {pre}_parse.cpp {pre}_syntax.cpp {pre}_main.cpp"
+
+    for argument "install" [
+        use exec "{sudo} {compiler} {flag/s} {standard} {files} -o {output}"
+
+        for exists "{output}" [
+            println "Installed to {output}"
+        ]
+    ]
+
+    use signal "exit"
+]

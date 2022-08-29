@@ -1,0 +1,14 @@
+if argc equal_to 1 =
+ print(arg_0 + " - file reader\n",
+      "--------------------------\n",
+      arg_0 + " file\n");
+; else =
+ if is_file(arg_1) equal_to true =
+  global data = read_file(arg_1);
+  print(data);
+ ; elif path_exists(arg_1) equal_to true =
+  print(arg_1 + " seems like not a file\n");
+ ; else =
+  print(arg_1 + " seems not in this directory\n");
+ ;
+;

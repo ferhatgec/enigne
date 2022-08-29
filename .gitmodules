@@ -1,0 +1,6 @@
+[submodule "libs/escafe"]
+	path = libs/escafe
+	url = https://github.com/ferhatgec/escafe.git
+[submodule "libs/idkformat"]
+	path = libs/idkformat
+	url = https://github.com/ferhatgec/idkformat
