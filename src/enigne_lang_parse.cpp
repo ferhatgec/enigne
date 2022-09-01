@@ -65,7 +65,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::Ast:
             case enignelang_syntax::Div:
             case enignelang_syntax::Minus:
-            case enignelang_syntax::Plus: {
+            case enignelang_syntax::Plus:
+            case enignelang_syntax::Mod: {
                 if(arg_handle.size() == 0) {
                     // empty queue = <empty> + <sth>
                     // push err or +num
@@ -276,12 +277,12 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
 
                     std::vector<enignelang_ast*> __args__;
                     this->handle_single_argument(__args__, node);
-                    node->other.push_back(this->wrap_argument(__args__));
+                    node->other.insert(node->other.end(), __args__.begin(), __args__.end());
                     __args__.clear();
                     while(this->current[this->index].token_type == enignelang_syntax::Comma) {
                         ++this->index;
                         this->handle_single_argument(__args__, node);
-                        node->other.push_back(this->wrap_argument(__args__));
+                        node->other.insert(node->other.end(), __args__.begin(), __args__.end());
                         __args__.clear();
                     }
 
@@ -327,12 +328,12 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
 
                 std::vector<enignelang_ast*> __args__;
                 this->handle_single_argument(__args__, node);
-                node->other.push_back(this->wrap_argument(__args__));
+                node->other.insert(node->other.end(), __args__.begin(), __args__.end());
                 __args__.clear();
                 while(this->current[this->index].token_type == enignelang_syntax::Comma) {
                     ++this->index;
                     this->handle_single_argument(__args__, node);
-                    node->other.push_back(this->wrap_argument(__args__));
+                    node->other.insert(node->other.end(), __args__.begin(), __args__.end());
                     __args__.clear();
                 }
 

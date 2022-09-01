@@ -51,7 +51,8 @@ public:
     std::string sub(const std::string& left, const std::string& right) noexcept;
     std::string div(const std::string& left, const std::string& right) noexcept;
     std::string mul(const std::string& left, const std::string& right) noexcept;
-
+    std::string mod(const std::string& left, const std::string& right) noexcept;
+    
     std::string get_variant_data(const std::string name) noexcept {
         if(name == "+" || name == "-"
         || name == "/" || name == "*"

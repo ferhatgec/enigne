@@ -69,6 +69,10 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             case '*': {
                 return this->mul(left_val, right_val);
             }
+
+            case '%': {
+                return this->mod(left_val, right_val);
+            }
         }
     } else if(expr->node_type == enignelang_syntax::BinComp) {
         auto left_val = this->handle_expr(expr->node_l);
@@ -98,8 +102,14 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         }
     } else if(expr->node_type == enignelang_syntax::FunctionVariant) {
         if(!expr->name.empty())
-            if(auto index = enignelang_syntax::return_num(expr->name); index < this->jump->other.size()) {
-                return this->jump->other[index]->node_current;
+            if(unsigned index = enignelang_syntax::return_num(expr->name); index < this->jump->other.size()) {
+                auto val = this->jump->other[index];
+            
+                if(val->node_type == enignelang_syntax::Argument && index < val->other.size()) {
+                    return this->handle_expr(val->other[index]);
+                }
+
+                return this->handle_expr(val);
             } else {
                 return "";
             }
@@ -273,6 +283,8 @@ enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var,
 
 
 std::string enignelang_intptr::add(const std::string &left, const std::string &right) noexcept {
+    if(left.empty()) return right;
+    if(right.empty()) return left;
     if(enignelang_syntax::is_valid_number(left)) {
         if(enignelang_syntax::is_valid_number(right)) {
             std::string temp = std::to_string(enignelang_syntax::return_num(left) 
@@ -359,6 +371,25 @@ std::string enignelang_intptr::mul(const std::string &left, const std::string &r
             return left + right;
         } else {
             // string + num
+        }
+    }
+
+    return "";
+}
+
+std::string enignelang_intptr::mod(const std::string &left, const std::string &right) noexcept {
+    if(enignelang_syntax::is_valid_number(left)) {
+        if(enignelang_syntax::is_valid_number(right)) {
+            return std::to_string(std::fmod(enignelang_syntax::return_num(left), enignelang_syntax::return_num(right)));
+        } else {
+            // num + string
+        }
+    }  else {
+        if(!enignelang_syntax::is_valid_number(right)) {
+            // string + string
+            return std::to_string(left.length() % right.length());
+        } else {
+            return std::to_string(std::fmod(left.length(), enignelang_syntax::return_num(right)));
         }
     }
 

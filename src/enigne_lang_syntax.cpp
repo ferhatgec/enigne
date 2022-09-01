@@ -63,6 +63,7 @@ void enignelang_syntax::tokenize() noexcept {
             case '=':
             case ':':
             case '^':
+            case '%':
             case '$':
             case '@':
             case '!':

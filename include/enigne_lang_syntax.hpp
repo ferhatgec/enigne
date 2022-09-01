@@ -59,6 +59,7 @@ public:
         Div, // /
         Ast, // *
         Exp, // ^
+        Mod, // %
         Factorial, // !
         Space, // ' '
         Eq, // =
@@ -176,6 +177,9 @@ Undefined = -1
 
             IMPL_TOKEN("^", this->Exp),
             IMPL_TOKEN("pow", this->Exp),
+
+            IMPL_TOKEN("%", this->Mod),
+            IMPL_TOKEN("mod", this->Mod),
 
             IMPL_TOKEN("!", this->Factorial),
 
