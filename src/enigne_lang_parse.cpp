@@ -96,7 +96,11 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                     break;
                 }
 
-                if(this->is_if) {
+                if(from != nullptr && 
+                    (from->node_type == enignelang_syntax::If ||
+                    from->node_type == enignelang_syntax::Elif ||
+                    from->node_type == enignelang_syntax::LoopIf ||
+                    from->node_type == enignelang_syntax::LoopElif)) {
                     return (arg_handle.empty()) ? nullptr : arg_handle.back();
                 }
 
@@ -301,6 +305,7 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                         }
                     }
                     
+                    
                     // from->other.push_back(std::forward<enignelang_ast*>(node));
                     arg_handle.push_back(std::forward<enignelang_ast*>(node));
                 }
@@ -420,7 +425,13 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                               "string_constant",
                               enignelang_syntax::Constant
                                 );
-                        last_arg->node_r->node_current = token.token;
+                        if(enignelang_syntax::is_valid_number(token.token)) {
+                            last_arg->node_r->node_current = std::to_string(
+                                enignelang_syntax::return_num(token.token));
+                        } else {
+                            last_arg->node_r->node_current = token.token;
+                        }
+
                         break;
                     }
                 }
@@ -432,7 +443,12 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast("constant",
                                                           "string_constant",
                                                           enignelang_syntax::Constant);
-                node->node_current = token.token;
+                if(enignelang_syntax::is_valid_number(token.token)) {
+                    node->node_current = std::to_string(
+                        enignelang_syntax::return_num(token.token));
+                } else {
+                    node->node_current = token.token;
+                }
 
                 arg_handle.push_back(std::forward<enignelang_ast*>(node));
 
@@ -710,7 +726,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 node->node_l = new enignelang_ast("if",
                                                   "[node: left]if_statement",
                                                   enignelang_syntax::BinComp);
-                node->node_l = this->handle_single_argument(arg_handle, node); arg_handle.clear();
+                node->node_l = this->handle_single_argument(arg_handle, node);
+
                 node->node_current = this->current[this->index].token;
                 ++this->index;
                 node->node_r = new enignelang_ast("if",
@@ -719,24 +736,20 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 node->node_r = this->handle_single_argument(arg_handle, node); arg_handle.clear();
                 ++this->index;
 
-
                 this->handle_start(node);
 
-                // aynisini elif yapisi icin de kullanacagiz
-                if(this->current[++this->index].token_type == enignelang_syntax::Else) {
-                    else_statement: if(this->index + 1 < this->current.size() &&
+                if(this->check_index() && 
+                    this->current[++this->index].token_type == enignelang_syntax::Else) {
+                    else_statement: if(this->check_index() &&
                         this->current[++this->index].token_type == enignelang_syntax::Eq) {
                         ++this->index; this->is_if = true;
                         enignelang_ast* else_node = new enignelang_ast("else",
                                                                         "else_statement",
                                                                         enignelang_syntax::Else);
                        
-                        
                         this->handle_start(else_node);
 
                         node->statement_list.push_back(std::forward<enignelang_ast*>(else_node));
-                       
-
                     } else {
                         std::cout << "syntax error found at ; else =\n"
                                      "                            ^^^ where?!!\n";
@@ -776,9 +789,9 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                     --this->index;
                 }
                
-
                 __node__->other.push_back(std::forward<enignelang_ast*>(node));
                 this->is_if = false;
+
                 break;
             }
 

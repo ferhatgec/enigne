@@ -38,11 +38,12 @@ int main(int argc, char** argv) {
     main.file(main.syntax.raw_file_data);
 
     for(unsigned i = 1; i < argc; i++) {
-        main.parser.push_constant("arg_" + std::to_string(::abs(i - 1)), "\"" + std::string(argv[i]) + "\"");
+        main.parser.push_constant("arg_" + std::to_string(::abs(i - 1)), "\"" + 
+            std::string(argv[i]) + "\"");
     }
 
     main.parser.argc = argc;
-    main.parser.push_constant("argc", std::to_string(argc - 1));
+    main.parser.push_constant("argc", std::to_string(static_cast<long double>(argc - 1)));
     
     main.parser.parse(main.syntax);
     

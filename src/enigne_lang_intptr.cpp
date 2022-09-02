@@ -81,9 +81,9 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         if(expr->node_current.empty()) return "";
 
         if(expr->node_current == "equal_to") {
-            return (left_val == right_val) ? "1" : "0";
+            return (left_val == right_val) ? std::to_string(static_cast<long double>(1)) : "0";
         } else if(expr->node_current == "not_equal_to") {
-            return (left_val != right_val) ? "1" : "0";
+            return (left_val != right_val) ? std::to_string(static_cast<long double>(1)) : "0";
         }
     } else if(expr->node_type == enignelang_syntax::Constant) {
         return expr->node_current;
@@ -196,28 +196,28 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return "0";
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
-            return std::to_string(enignelang_fs::is_file(val));
+            return std::to_string(static_cast<long double>(enignelang_fs::is_file(val)));
         }
     } else if(expr->node_type == enignelang_syntax::IsDir) {
         if(expr->other.empty()) {
             return "0";
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
-            return std::to_string(enignelang_fs::is_dir(val));
+            return std::to_string(static_cast<long double>(enignelang_fs::is_dir(val)));
         }
     } else if(expr->node_type == enignelang_syntax::IsSymlink) {
         if(expr->other.empty()) {
             return "0";
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
-            return std::to_string(enignelang_fs::is_symlink(val));
+            return std::to_string(static_cast<long double>(enignelang_fs::is_symlink(val)));
         }
     } else if(expr->node_type == enignelang_syntax::PathExists) {
         if(expr->other.empty()) {
             return "0";
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
-            return std::to_string(enignelang_fs::path_exists(val));
+            return std::to_string(static_cast<long double>(enignelang_fs::path_exists(val)));
         }
     } else if(expr->node_type == enignelang_syntax::ReadFile) {
         if(expr->other.empty()) {
@@ -285,15 +285,14 @@ enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var,
 std::string enignelang_intptr::add(const std::string &left, const std::string &right) noexcept {
     if(left.empty()) return right;
     if(right.empty()) return left;
+
     if(enignelang_syntax::is_valid_number(left)) {
         if(enignelang_syntax::is_valid_number(right)) {
             std::string temp = std::to_string(enignelang_syntax::return_num(left) 
                 + enignelang_syntax::return_num(right));
             
             if(!temp.empty()) {
-                if(temp = temp.erase(temp.find_last_not_of('0') + 1, temp.npos); temp.back() == '.') {
-                    temp.pop_back();
-                } return temp;
+                return temp;
             } else
                 return "0";
         } else if(!right.empty()) {
@@ -320,9 +319,24 @@ std::string enignelang_intptr::add(const std::string &left, const std::string &r
 }
 
 std::string enignelang_intptr::sub(const std::string &left, const std::string &right) noexcept {
+    if(left.empty()) return right;
+    if(right.empty()) return left;
+
     if(enignelang_syntax::is_valid_number(left)) {
         if(enignelang_syntax::is_valid_number(right)) {
-            return std::to_string(enignelang_syntax::return_num(left) - enignelang_syntax::return_num(right));
+            std::string temp = "";
+
+            if(long double val = enignelang_syntax::return_num(left) - enignelang_syntax::return_num(right);
+                val < 0) {
+                temp = std::to_string(val);
+            } else {
+                temp = std::to_string(val);
+            }
+
+            if(!temp.empty())
+                return temp;
+            else
+                return "0";
         } else {
             // num + string
         }
@@ -339,6 +353,9 @@ std::string enignelang_intptr::sub(const std::string &left, const std::string &r
 }
 
 std::string enignelang_intptr::div(const std::string &left, const std::string &right) noexcept {
+    if(left.empty()) return right;
+    if(right.empty()) return left;
+
     if(enignelang_syntax::is_valid_number(left)) {
         if(auto val = enignelang_syntax::return_num(right);
             enignelang_syntax::is_valid_number(right)) {
@@ -359,6 +376,9 @@ std::string enignelang_intptr::div(const std::string &left, const std::string &r
 }
 
 std::string enignelang_intptr::mul(const std::string &left, const std::string &right) noexcept {
+    if(left.empty()) return right;
+    if(right.empty()) return left;
+
     if(enignelang_syntax::is_valid_number(left)) {
         if(enignelang_syntax::is_valid_number(right)) {
             return std::to_string(enignelang_syntax::return_num(left) * enignelang_syntax::return_num(right));
@@ -378,6 +398,9 @@ std::string enignelang_intptr::mul(const std::string &left, const std::string &r
 }
 
 std::string enignelang_intptr::mod(const std::string &left, const std::string &right) noexcept {
+    if(left.empty()) return right;
+    if(right.empty()) return left;
+    
     if(enignelang_syntax::is_valid_number(left)) {
         if(enignelang_syntax::is_valid_number(right)) {
             return std::to_string(std::fmod(enignelang_syntax::return_num(left), enignelang_syntax::return_num(right)));
@@ -647,10 +670,12 @@ void enignelang_intptr::walk(enignelang_ast* node,
             if(node->node_current == "equal_to") {
                 if(this->handle_expr(node->node_l)
                      == this->handle_expr(node->node_r)) {
+                    
                     for(auto& val: node->other) {
                         if(val != nullptr && val->node_type == enignelang_syntax::Break) {
                             return;
                         }
+
                         walk(val, node, val->node_type, val->func_args);
                     }
                 } else if(!node->statement_list.empty()) {

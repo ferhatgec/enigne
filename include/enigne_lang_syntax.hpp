@@ -276,7 +276,7 @@ public:
 
         if(*p) return 0;
 
-        return acc;
+        return acc * s;
     }
 };
 
