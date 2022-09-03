@@ -319,7 +319,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::ReadFile:
             case enignelang_syntax::PathExists:
             case enignelang_syntax::Exec:
-            case enignelang_syntax::Exit: {
+            case enignelang_syntax::Exit:
+            case enignelang_syntax::Length: {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                             "inline_function_call",
                                                              token.token_type);
@@ -922,7 +923,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::ReadFile:
             case enignelang_syntax::PathExists:
             case enignelang_syntax::Exec:
-            case enignelang_syntax::Exit: {
+            case enignelang_syntax::Exit:
+            case enignelang_syntax::Length: {
                 __node__->other.push_back(
                         std::forward<enignelang_ast*>(this->impl_generic_fn_call(token.token, 
                                                                                 "[built-in]function_call", 

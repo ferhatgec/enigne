@@ -244,6 +244,22 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             std::exit(1);
         
         std::exit(0);
+    } else if(expr->node_type == enignelang_syntax::Length) {
+        if(expr->other.empty()) {
+            return "0";
+        } else {
+            auto val = this->handle_expr(expr->other[0]);
+            
+            if(enignelang_syntax::is_valid_number(val)) {
+                val = std::to_string(enignelang_syntax::return_num(val));
+                val = val.erase(val.find_last_not_of('0') + 1, std::string::npos);
+                
+                if(val.back() == '.')
+                    val.pop_back();
+            }
+
+            return std::to_string(static_cast<long double>(this->remove_hints(val).length()));
+        }
     }
 
     return "";
