@@ -279,15 +279,17 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                     
                     ++this->index;
 
-                    std::vector<enignelang_ast*> __args__;
-                    this->handle_single_argument(__args__, node);
-                    node->other.insert(node->other.end(), __args__.begin(), __args__.end());
-                    __args__.clear();
-                    while(this->current[this->index].token_type == enignelang_syntax::Comma) {
-                        ++this->index;
+                    if(this->check_index() && this->current[this->index].token_type != enignelang_syntax::RightPr) {
+                        std::vector<enignelang_ast*> __args__;
                         this->handle_single_argument(__args__, node);
                         node->other.insert(node->other.end(), __args__.begin(), __args__.end());
                         __args__.clear();
+                        while(this->current[this->index].token_type == enignelang_syntax::Comma) {
+                            ++this->index;
+                            this->handle_single_argument(__args__, node);
+                            node->other.insert(node->other.end(), __args__.begin(), __args__.end());
+                            __args__.clear();
+                        }
                     }
 
                     if(!arg_handle.empty()) {
@@ -320,7 +322,14 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::PathExists:
             case enignelang_syntax::Exec:
             case enignelang_syntax::Exit:
-            case enignelang_syntax::Length: {
+            case enignelang_syntax::Length:
+            case enignelang_syntax::Absolute:
+            case enignelang_syntax::Ceil:
+            case enignelang_syntax::Floor:
+            case enignelang_syntax::Logarithm:
+            case enignelang_syntax::SquareRoot:
+            case enignelang_syntax::Pi:
+            case enignelang_syntax::Euler: {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                             "inline_function_call",
                                                              token.token_type);
@@ -332,15 +341,17 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                     std::exit(1);
                 } ++this->index;
 
-                std::vector<enignelang_ast*> __args__;
-                this->handle_single_argument(__args__, node);
-                node->other.insert(node->other.end(), __args__.begin(), __args__.end());
-                __args__.clear();
-                while(this->current[this->index].token_type == enignelang_syntax::Comma) {
-                    ++this->index;
+                if(this->check_index() && this->current[this->index].token_type != enignelang_syntax::RightPr) {
+                    std::vector<enignelang_ast*> __args__;
                     this->handle_single_argument(__args__, node);
                     node->other.insert(node->other.end(), __args__.begin(), __args__.end());
                     __args__.clear();
+                    while(this->current[this->index].token_type == enignelang_syntax::Comma) {
+                        ++this->index;
+                        this->handle_single_argument(__args__, node);
+                        node->other.insert(node->other.end(), __args__.begin(), __args__.end());
+                        __args__.clear();
+                    }
                 }
 
                 if(!arg_handle.empty()) {
@@ -349,18 +360,17 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                         || last_arg->node_type == enignelang_syntax::BinComp)
                         && last_arg->node_r == nullptr) {
                         last_arg->node_r = new enignelang_ast(
-                              token.token,
-                              "inline_function_call",
-                              token.token_type
-                                );
-                            last_arg->node_r = node;
+                            token.token,
+                            "inline_function_call",
+                            token.token_type);
+                        last_arg->node_r = node;
                             
-                            break;
-                        }
+                        break;
                     }
+                }
                     
-                    // from->other.push_back(std::forward<enignelang_ast*>(node));
-                    arg_handle.push_back(std::forward<enignelang_ast*>(node));
+                // from->other.push_back(std::forward<enignelang_ast*>(node));
+                arg_handle.push_back(std::forward<enignelang_ast*>(node));
                 break;
             }
 
@@ -924,7 +934,14 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::PathExists:
             case enignelang_syntax::Exec:
             case enignelang_syntax::Exit:
-            case enignelang_syntax::Length: {
+            case enignelang_syntax::Length:
+            case enignelang_syntax::Absolute:
+            case enignelang_syntax::Ceil:
+            case enignelang_syntax::Floor:
+            case enignelang_syntax::Logarithm:
+            case enignelang_syntax::SquareRoot:
+            case enignelang_syntax::Pi:
+            case enignelang_syntax::Euler: {
                 __node__->other.push_back(
                         std::forward<enignelang_ast*>(this->impl_generic_fn_call(token.token, 
                                                                                 "[built-in]function_call", 

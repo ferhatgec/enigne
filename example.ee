@@ -14,6 +14,11 @@ if argc equal_to 1 =
 ;
 
 print(len("Hello world\n"), "\n");
+print(abs(-3), " ", abs(0), " ", abs(3), " ", abs(-3.7), " ", abs(3.7), "\n");
+print(ceil(3.7), " ", floor(3.7), "\n");
+print(log(16, 2), " ", log(0, 0), " ", log(16, 1), "\n");
+print(sqrt(16), " ", sqrt(2), " ", sqrt(-1), "\n");
+print(pi(), " ", e(), " ", pi() * e(), "\n");
 
 exit();
 

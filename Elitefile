@@ -13,7 +13,8 @@ for signal "start" [
     set pre as "src/enigne_lang"
     set mod as "src/modules/enigne_lang"
 
-    set files as "{mod}_chars.cpp        
+    set files as "{mod}_math.cpp
+                  {mod}_chars.cpp        
                   {mod}_system.cpp 
                   {mod}_fs.cpp 
                   {pre}_ast.cpp 

@@ -87,7 +87,14 @@ public:
         IsSymlink, // is_symlink
         ReadFile, // read_file
         Exit, // exit
-        Length, // len 
+        Length, // len
+        Absolute, // abs
+        Ceil, // ceil
+        Floor, // floor
+        Logarithm, // log
+        SquareRoot, // sqrt
+        Pi, // pi
+        Euler, // e
 Undefined = -1
     };
 
@@ -197,7 +204,14 @@ Undefined = -1
             IMPL_TOKEN("is_symlink", this->IsSymlink),
             IMPL_TOKEN("read_file", this->ReadFile),
             IMPL_TOKEN("exit", this->Exit),
-            IMPL_TOKEN("len", this->Length)
+            IMPL_TOKEN("len", this->Length),
+            IMPL_TOKEN("abs", this->Absolute),
+            IMPL_TOKEN("ceil", this->Ceil),
+            IMPL_TOKEN("floor", this->Floor),
+            IMPL_TOKEN("log", this->Logarithm),
+            IMPL_TOKEN("sqrt", this->SquareRoot),
+            IMPL_TOKEN("pi", this->Pi),
+            IMPL_TOKEN("e", this->Euler)
     };
 
     std::string raw_file_data;

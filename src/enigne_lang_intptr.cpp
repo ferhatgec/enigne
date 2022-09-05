@@ -8,6 +8,7 @@
 #include "../include/enigne_lang_syntax.hpp"
 #include "../include/modules/enigne_lang_fs.hpp"
 #include "../include/modules/enigne_lang_system.hpp"
+#include "../include/modules/enigne_lang_math.hpp"
 #include <iostream>
 #include <any>
 #include <ranges>
@@ -260,6 +261,42 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
 
             return std::to_string(static_cast<long double>(this->remove_hints(val).length()));
         }
+    } else if(expr->node_type == enignelang_syntax::Absolute) {
+        if(expr->other.empty()) {
+            return "0";
+        } 
+        
+        return enignelang_math::abs(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::Ceil) {
+        if(expr->other.empty()) {
+            return "0";
+        } 
+        
+        return enignelang_math::ceil(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::Floor) {
+        if(expr->other.empty()) {
+            return "0";
+        } 
+        
+        return enignelang_math::floor(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::Logarithm) {
+        if(expr->other.size() < 2) {
+            return "0";
+        } 
+        
+        return enignelang_math::log(
+            this->remove_hints(this->handle_expr(expr->other[0])), this->remove_hints(this->handle_expr(expr->other[1])));
+    } else if(expr->node_type == enignelang_syntax::SquareRoot) {
+        if(expr->other.empty()) {
+            return "0";
+        } 
+        
+        return enignelang_math::sqrt(
+            this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::Pi) {
+        return enignelang_math::pi();    
+    } else if(expr->node_type == enignelang_syntax::Euler) {
+        return enignelang_math::e();
     }
 
     return "";
@@ -591,7 +628,7 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
 
                     default: {
-                        if(!data->other.empty())
+                        if(!data->other.empty() || data->node_type >= enignelang_syntax::PathExists)
                             std::cout << this->handle_expr(data);
                         break;
                     }
