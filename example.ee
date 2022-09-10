@@ -19,6 +19,11 @@ print(ceil(3.7), " ", floor(3.7), "\n");
 print(log(16, 2), " ", log(0, 0), " ", log(16, 1), "\n");
 print(sqrt(16), " ", sqrt(2), " ", sqrt(-1), "\n");
 print(pi(), " ", e(), " ", pi() * e(), "\n");
+print(to_lower("ENIGNE"), " ", 
+      to_upper("lang"), " ", 
+      starts_with("enigne"), " ", 
+      ends_with("enigne"), " ",
+      starts_with("enigne") equal_to ends_with("enigne"), "\n");
 
 exit();
 

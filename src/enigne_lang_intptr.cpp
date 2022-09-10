@@ -6,6 +6,7 @@
 
 #include "../include/enigne_lang_intptr.hpp"
 #include "../include/enigne_lang_syntax.hpp"
+#include "../include/modules/enigne_lang_chars.hpp"
 #include "../include/modules/enigne_lang_fs.hpp"
 #include "../include/modules/enigne_lang_system.hpp"
 #include "../include/modules/enigne_lang_math.hpp"
@@ -297,6 +298,30 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         return enignelang_math::pi();    
     } else if(expr->node_type == enignelang_syntax::Euler) {
         return enignelang_math::e();
+    } else if(expr->node_type == enignelang_syntax::StartsWith) {
+        if(expr->other.empty()) {
+            return "";
+        } 
+        
+        return enignelang_chars::starts_with(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::EndsWith) {
+        if(expr->other.empty()) {
+            return "";
+        } 
+        
+        return enignelang_chars::ends_with(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::ToUpper) {
+        if(expr->other.empty()) {
+            return "";
+        } 
+        
+        return enignelang_chars::to_upper(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::ToLower) {
+        if(expr->other.empty()) {
+            return "";
+        } 
+        
+        return enignelang_chars::to_lower(this->remove_hints(this->handle_expr(expr->other[0])));
     }
 
     return "";

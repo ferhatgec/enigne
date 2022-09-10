@@ -95,6 +95,10 @@ public:
         SquareRoot, // sqrt
         Pi, // pi
         Euler, // e
+        StartsWith, // starts_with
+        EndsWith, // ends_with
+        ToLower, // to_lower
+        ToUpper, // to_upper
 Undefined = -1
     };
 
@@ -211,7 +215,11 @@ Undefined = -1
             IMPL_TOKEN("log", this->Logarithm),
             IMPL_TOKEN("sqrt", this->SquareRoot),
             IMPL_TOKEN("pi", this->Pi),
-            IMPL_TOKEN("e", this->Euler)
+            IMPL_TOKEN("e", this->Euler),
+            IMPL_TOKEN("starts_with", this->StartsWith),
+            IMPL_TOKEN("ends_with", this->EndsWith),
+            IMPL_TOKEN("to_lower", this->ToLower),
+            IMPL_TOKEN("to_upper", this->ToUpper)
     };
 
     std::string raw_file_data;
