@@ -1,3 +1,10 @@
+global primes = [2, 3, 5, 7, 11, 13, 17, 19];
+global gech = "gech";
+
+if (primes.0 + primes.1) equal_to primes.2 =
+ print(gech.0 + gech.1 + gech.2 + gech.3 + gech.4 + gech.5, "\n");
+;
+
 if argc equal_to 1 =
  print(arg_0 + " - file reader\n",
       "--------------------------\n",
@@ -13,6 +20,19 @@ if argc equal_to 1 =
  ;
 ;
 
+f :input =
+ global var = "";
+ global ch = "";
+
+ loopif ch not_equal_to "\n" =
+  ~ch = char_input();
+  print(ch);
+  ~var = var + ch;
+ ;
+
+ return var;
+;
+
 print(len("Hello world\n"), "\n");
 print(abs(-3), " ", abs(0), " ", abs(3), " ", abs(-3.7), " ", abs(3.7), "\n");
 print(ceil(3.7), " ", floor(3.7), "\n");
@@ -24,6 +44,10 @@ print(to_lower("ENIGNE"), " ",
       starts_with("enigne"), " ", 
       ends_with("enigne"), " ",
       starts_with("enigne") equal_to ends_with("enigne"), "\n");
+
+print("type something: ", :input());
+
+print("press any key to continue", char_input(), "\n");
 
 exit();
 

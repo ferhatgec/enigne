@@ -82,11 +82,12 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                         arg_handle.back()->node_type
                         );
 
-                node->node_l->node_current = arg_handle.back()->node_current;
+                
                 node->node_l = arg_handle.back();
                 arg_handle.pop_back();
                 node->node_current = token.token;
                 arg_handle.push_back(std::forward<enignelang_ast*>(node));
+                
                 break;
             }
 
@@ -135,7 +136,7 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::LeftBPr: {
                 std::vector<enignelang_ast*> args;
 
-                /*if(!arg_handle.empty()) {
+                if(!arg_handle.empty()) {
                     if(auto& last_arg = arg_handle.back();
                         (last_arg->node_type == enignelang_syntax::BinOp
                         || last_arg->node_type == enignelang_syntax::BinComp)
@@ -149,45 +150,78 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                                                           "array",
                                                           enignelang_syntax::LeftBPr);
                         
-                        while(++this->index && this->check_index() && this->current[this->index].token_type != enignelang_syntax::RightBPr) {
+                        while(this->check_index() && 
+                            (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
+                            if(this->current[this->index].token_type == enignelang_syntax::LeftBPr) {
+                                std::vector<enignelang_ast*> _args;
+                                auto val = this->handle_single_argument(_args, node);
+
+                                if(val != nullptr) {
+                                    node->other.push_back(val);
+                                }
+
+                                if(this->current[this->index].token_type == enignelang_syntax::Sem) {
+                                    --this->index; --this->index;
+                                }
+
+                                continue;
+                            } else if(this->current[this->index - 1].token_type == enignelang_syntax::RightBPr) {
+                                --this->index;
+                                break;
+                            }
+
+                            if(this->current[this->index].token_type == enignelang_syntax::Sem
+                                || this->current[this->index].token_type == enignelang_syntax::RightBPr) {
+                                break;
+                            }
+
                             node->other.push_back(this->handle_single_argument(args, node));
                         }
                         
                         last_arg->node_r = node;
+
                         break;
                     }
                 }
 
                 if(!arg_handle.empty() && arg_handle.back()->node_type == enignelang_syntax::Comma) {
                     arg_handle.pop_back();
-                }*/
-
+                }
+                
                 enignelang_ast* node = new enignelang_ast("array",
                                                           "array",
                                                           enignelang_syntax::LeftBPr);
                 // [5, 3, [5, 2]]
                 while(this->check_index() && 
-                    (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
-                    if(this->current[this->index].token_type == enignelang_syntax::LeftBPr) {
-                        std::vector<enignelang_ast*> args;
-                        node->other.push_back(this->handle_single_argument(args, node));
-                        continue;
-                    } else if(this->current[this->index - 1].token_type == enignelang_syntax::RightBPr) {
-                        --this->index;
-                        break;
-                    }
+                            (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
+                            if(this->current[this->index].token_type == enignelang_syntax::LeftBPr) {
+                                std::vector<enignelang_ast*> _args;
+                                auto val = this->handle_single_argument(_args, node);
 
-                    node->other.push_back(this->handle_single_argument(args, node));
-                }
+                                if(val != nullptr) {
+                                    node->other.push_back(val);
+                                }
+
+                                if(this->current[this->index].token_type == enignelang_syntax::Sem) {
+                                    --this->index; --this->index; 
+                                }
+
+                                continue;
+                            } else if(this->current[this->index - 1].token_type == enignelang_syntax::RightBPr) {
+                                --this->index;
+                                break;
+                            }
+
+                            if(this->current[this->index].token_type == enignelang_syntax::Sem
+                                || this->current[this->index].token_type == enignelang_syntax::RightBPr) {
+                                break;
+                            }
+
+                            node->other.push_back(this->handle_single_argument(args, node));
+                        }
+                        
 
                 arg_handle.push_back(std::forward<enignelang_ast*>(node));
-
-                if(this->current[this->index].token_type == enignelang_syntax::Sem
-                    || this->current[this->index].token_type == enignelang_syntax::RightBPr) {
-                    return std::forward<enignelang_ast*>(node);
-                }
-
-
 
                 break;
             }
@@ -222,6 +256,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 if(this->index + 1 < this->current.size()) {
                     if(this->current[this->index + 1].token_type == enignelang_syntax::LeftPr) {
                         break;
+                    } else if(this->current[this->index + 1].token_type == enignelang_syntax::Element) {
+                        goto elem;
                     }
                 }
 
@@ -260,6 +296,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 }
 
                 arg_handle.push_back(std::forward<enignelang_ast*>(node));
+
+                if(from != nullptr && from->node_type == enignelang_syntax::Element)
+                    return arg_handle.back();
 
                 break;
             }
@@ -333,7 +372,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::StartsWith:
             case enignelang_syntax::EndsWith:
             case enignelang_syntax::ToUpper:
-            case enignelang_syntax::ToLower: {
+            case enignelang_syntax::ToLower:
+            case enignelang_syntax::CharInput: {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                             "inline_function_call",
                                                              token.token_type);
@@ -467,6 +507,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
 
                 arg_handle.push_back(std::forward<enignelang_ast*>(node));
 
+                if(from != nullptr && from->node_type == enignelang_syntax::Element)
+                    return arg_handle.back();
+
                 break;
             }
 
@@ -497,6 +540,53 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
 
                 auto val = this->handle_single_argument(arg_handle, nullptr);
                 arg_handle.push_back(std::forward<enignelang_ast*>(val));
+
+                if(from != nullptr && from->node_type == enignelang_syntax::Element)
+                    return arg_handle.back();
+
+                break;
+            }
+
+            case enignelang_syntax::Element: {
+                elem: if(this->check_index() - 1 < 0) { break; }
+
+                if(!arg_handle.empty()) {
+                    if(auto& last_arg = arg_handle.back();
+                        (last_arg->node_type == enignelang_syntax::BinOp
+                        || last_arg->node_type == enignelang_syntax::BinComp)
+                        && last_arg->node_r == nullptr) {
+                        if(this->check_index() && this->current[++this->index].token_type == enignelang_syntax::Element) {
+                            last_arg->node_r = new enignelang_ast(
+                                this->current[this->index - 1].token,
+                                "element",
+                                enignelang_syntax::Element
+                            );
+
+                            std::vector<enignelang_ast*> __args__;
+                            last_arg->node_r->other.push_back(this->handle_single_argument(__args__, last_arg->node_r));
+                        }
+
+                        break;
+                    }
+                }
+
+                if(const auto val = this->current[this->index]; val.token_type == enignelang_syntax::VariantLit) {
+                    if(this->check_index() && this->current[++this->index].token_type == enignelang_syntax::Element) {
+                        enignelang_ast* node = new enignelang_ast(
+                            val.token,
+                            "element",
+                            enignelang_syntax::Element
+                        );
+
+
+                        std::vector<enignelang_ast*> __args__;
+                        node->other.push_back(this->handle_single_argument(__args__, node));
+
+                        arg_handle.push_back(std::forward<enignelang_ast*>(node));
+                    }
+
+                    break;
+                }
 
                 break;
             }
@@ -629,7 +719,7 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                     arg_handle.clear();
                     
                     node->other.push_back(this->handle_single_argument(arg_handle, node));
-                    
+
                     arg_handle.clear();
                 } else {
                     node->other.push_back(nullptr);
@@ -949,7 +1039,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::StartsWith:
             case enignelang_syntax::EndsWith:
             case enignelang_syntax::ToUpper:
-            case enignelang_syntax::ToLower: {
+            case enignelang_syntax::ToLower:
+            case enignelang_syntax::CharInput: {
                 __node__->other.push_back(
                         std::forward<enignelang_ast*>(this->impl_generic_fn_call(token.token, 
                                                                                 "[built-in]function_call", 

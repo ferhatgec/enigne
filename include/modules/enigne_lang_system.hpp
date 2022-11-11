@@ -10,5 +10,6 @@
 #include <string>
 
 namespace enignelang_system {
-    const std::string output(const std::string& command) noexcept;     
+    const std::string output(const std::string& command) noexcept;
+    const std::string char_input() noexcept;  
 }

@@ -68,6 +68,7 @@ void enignelang_syntax::tokenize() noexcept {
             case '@':
             case '!':
             case '~':
+            case '.':
             case ' ':{
                 if(data)
                     current_token.push_back(this->raw_file_data[i]);

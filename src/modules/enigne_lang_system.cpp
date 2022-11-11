@@ -6,6 +6,7 @@
 
 #include "../../include/modules/enigne_lang_system.hpp"
 #include <unistd.h>
+#include <termios.h>
 
 #define SIZE 128
 
@@ -22,5 +23,24 @@ const std::string enignelang_system::output(const std::string& command) noexcept
         if(fgets(buffer, SIZE, file) != NULL)
             result += buffer;
     } pclose(file);
+    
     return result;
+}
+
+const std::string enignelang_system::char_input() noexcept {
+    struct termios t;
+    char ch;
+    
+    tcgetattr(0, &t);
+    t.c_lflag &= ~ECHO + ~ICANON;
+    tcsetattr(0, TCSANOW, &t);
+    
+    fflush(stdout);
+    
+    ch = getchar();
+    
+    t.c_lflag |= ICANON + ECHO;
+    tcsetattr(0, TCSANOW, &t);
+    
+    return "\"" + std::string(1, ch) + "\"";
 }

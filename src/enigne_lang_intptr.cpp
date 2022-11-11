@@ -46,7 +46,6 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         if((expr->node_l != nullptr && expr->node_l->node_type == enignelang_syntax::LeftBPr)
             || (expr->node_r != nullptr && expr->node_r->node_type == enignelang_syntax::LeftBPr)) {
             std::cout << "note: do not try to add constants directly to array\n";
-            std::exit(1);
         }
 
         auto left_val = this->handle_expr(expr->node_l);
@@ -193,7 +192,48 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
                 } break;
             }
         }
-    } else if(expr->node_type == enignelang_syntax::IsFile) {
+    } else if(expr->node_type == enignelang_syntax::LeftBPr) {
+        std::string __data__ = "[";
+
+        for(auto& val: expr->other) {
+            if(val == nullptr) continue;
+            
+            const std::string data = this->handle_expr(val);
+            __data__.append(data + ", ");
+        }
+
+        return __data__ + "]";
+    } else if(expr->node_type == enignelang_syntax::Element) {
+        for(auto& val: this->global_variants) {
+            if(val->name == expr->name) {
+                if(val->other.empty()) return "";
+
+                if(auto __val__ = val->other.front(); __val__->node_type == enignelang_syntax::LeftBPr) {
+                    std::string index = "";
+                    
+                    if(expr->other.empty()) index = "0";
+                    else index = this->handle_expr(expr->other[0]);
+
+                    if(auto __index__ = static_cast<std::size_t>(enignelang_syntax::return_num(index));
+                        __index__ < __val__->other.size()) {
+                        return this->handle_expr(__val__->other[__index__]);
+                    }
+                } else if(__val__->node_type == enignelang_syntax::Constant) {
+                    std::string index = "";
+                    
+                    if(expr->other.empty()) index = "0";
+                    else index = this->handle_expr(expr->other[0]);
+
+                    if(auto __index__ = static_cast<std::size_t>(enignelang_syntax::return_num(index));
+                        __index__ < __val__->node_current.length()) {
+                        return "\"" + std::string(1, __val__->node_current[__index__]) + "\"";
+                    } // else {
+                      //  // out of range   
+                      // }
+                }
+            }
+        }
+    } if(expr->node_type == enignelang_syntax::IsFile) {
         if(expr->other.empty()) {
             return "0";
         } else {
@@ -322,6 +362,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         } 
         
         return enignelang_chars::to_lower(this->remove_hints(this->handle_expr(expr->other[0])));
+    } else if(expr->node_type == enignelang_syntax::CharInput) {
+        return enignelang_system::char_input();
     }
 
     return "";
@@ -550,7 +592,7 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
                     case enignelang_syntax::VariantLit: {
                          for(auto& val: this->global_variants) {
-                            if(val->name == data->name) {
+                            if(val->name == data->name) {                                
                                 if(!val->other.empty()) {
                                     if(auto& __val__ = val->other[0]; __val__->node_type == enignelang_syntax::Constant) {
                                         std::cout << __val__->node_current;
@@ -1014,6 +1056,11 @@ void enignelang_intptr::walk(enignelang_ast* node,
             
             std::exit(0);
         }
+
+        case enignelang_syntax::CharInput: {
+            ::getchar();
+            break;
+        }
         
         case enignelang_syntax::Variant: {
             for(auto& data: this->global_variants) {
@@ -1048,12 +1095,6 @@ void enignelang_intptr::walk(enignelang_ast* node,
 }
 
 void enignelang_intptr::start() noexcept {
-    for(auto& val: this->main_structure->other) {
-        if(val->node_type == enignelang_syntax::Variant) {
-            this->global_variants.push_back(val);
-        }
-    }
-
     for(; index < this->main_structure->other.size(); ++index) {
         if(auto val = this->main_structure->other[index]->node_type; val == enignelang_syntax::Function) {
             continue;

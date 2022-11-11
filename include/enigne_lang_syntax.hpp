@@ -66,6 +66,7 @@ public:
         Colon, // :
         Comma, // ,
         Tilde, // ~
+        Element, // #
         Newline, //
 
         GlobalNode,
@@ -99,6 +100,7 @@ public:
         EndsWith, // ends_with
         ToLower, // to_lower
         ToUpper, // to_upper
+        CharInput, // char_input
 Undefined = -1
     };
 
@@ -200,6 +202,7 @@ Undefined = -1
             IMPL_TOKEN(":", this->Colon),
             IMPL_TOKEN(",", this->Comma),
             IMPL_TOKEN("~", this->Tilde),
+            IMPL_TOKEN(".", this->Element),
             IMPL_TOKEN("\n", this->Newline),
             
             IMPL_TOKEN("path_exists", this->PathExists),
@@ -219,7 +222,8 @@ Undefined = -1
             IMPL_TOKEN("starts_with", this->StartsWith),
             IMPL_TOKEN("ends_with", this->EndsWith),
             IMPL_TOKEN("to_lower", this->ToLower),
-            IMPL_TOKEN("to_upper", this->ToUpper)
+            IMPL_TOKEN("to_upper", this->ToUpper),
+            IMPL_TOKEN("char_input", this->CharInput)
     };
 
     std::string raw_file_data;
