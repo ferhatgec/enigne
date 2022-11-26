@@ -290,6 +290,18 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         if(expr->other.empty()) {
             return "0";
         } else {
+            if(auto __node_type = expr->other[0]; __node_type->node_type == enignelang_syntax::VariantLit) {
+                for(auto& var: this->global_variants) {
+                    if(var->name == __node_type->name)
+                        if(var->other.empty()) 
+                            return "0";
+                        else if(var->other[0]->node_type == enignelang_syntax::LeftBPr)
+                            return std::to_string(static_cast<long double>(var->other[0]->other.size()));
+                }
+            } else if(__node_type->node_type == enignelang_syntax::LeftBPr) {
+                return std::to_string(static_cast<long double>(__node_type->other.size()));
+            }
+
             auto val = this->handle_expr(expr->other[0]);
             
             if(enignelang_syntax::is_valid_number(val)) {
