@@ -10,10 +10,6 @@
 #include <fstream>
 #include <cstring>
 
-void enignelang::file(const std::string data) noexcept {
-    this->raw_file_data = data;
-}
-
 int main(int argc, char** argv) {
     if(argc < 2) {
         std::cout << "enigne interpreter (" << argv[0] << ")\n"

@@ -20,16 +20,33 @@ for signal "start" [
                   {pre}_ast.cpp 
                   {pre}_intptr.cpp 
                   {pre}_parse.cpp 
-                  {pre}_syntax.cpp 
-                  {pre}_main.cpp"
+                  {pre}_syntax.cpp"
+
+    set main_file as "{pre}_main.cpp"
     
+    for argument "install_as_library" [
+        for specific "linux" [
+            use exec "{sudo} 
+                        {compiler} 
+                        -fPIC -shared 
+                        -o /usr/local/lib/libenigne.so 
+                        {standard} {files}"
+
+            for exists "/usr/local/include/enigne" [
+                use exec "{sudo} rm -rf /usr/local/include/enigne/"
+            ]
+            
+            use exec "{sudo} cp -R include /usr/local/include/enigne/"
+        ]
+    ]
+
     for argument "update" [
         use exec "git submodule init"
         use exec "git submodule update"
     ]
 
     for argument "install" [
-        use exec "{sudo} {compiler} {flag/s} {standard} {files} -o {output}"
+        use exec "{sudo} {compiler} {flag/s} {standard} {files} {main_file} -o {output}"
 
         for exists "{output}" [
             println "Installed to {output}"

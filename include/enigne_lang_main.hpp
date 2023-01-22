@@ -28,5 +28,7 @@ public:
     enignelangfi file_info;
     enignelang_parse parser;
 public:
-    void file(const std::string data) noexcept;
+    void file(const std::string data) noexcept {
+        this->raw_file_data = data;
+    }
 };
