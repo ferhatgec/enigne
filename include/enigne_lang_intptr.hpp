@@ -15,7 +15,6 @@
 constexpr std::uint8_t recursion_limit = 255;
 
 class enignelang_intptr {
-    std::vector<enignelang_ast*> jump_states, global_variants;
     std::stack<enignelang_syntax::enignelang_tokens> def;
     std::vector<std::pair<std::string, std::string>> const_eval_functions;
     std::vector<std::string> current_node = {"global_node"};
@@ -27,6 +26,8 @@ class enignelang_intptr {
     std::uint8_t recursion_fn_call = 0;
     gechint rcrs_fn = 0;
 public:
+    std::vector<enignelang_ast*> jump_states, global_variants;
+    
     enignelang_ast* main_structure, *jump;
     enignelang_parse parser;
 
