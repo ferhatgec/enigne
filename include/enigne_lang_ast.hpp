@@ -36,6 +36,8 @@ public:
 
     std::vector<std::string> func_args;
     std::vector<std::string> expr;
+    
+    long long unsigned row = 1, column = 1;
 public:
     enignelang_ast() {
         this->name = "enigne_global_node_";

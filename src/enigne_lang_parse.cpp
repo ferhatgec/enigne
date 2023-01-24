@@ -26,6 +26,7 @@ enignelang_ast* enignelang_parse::impl_generic_fn_call(const std::string name,
                                             const std::string node_id,
                                             enignelang_syntax::enignelang_tokens syn) noexcept {
     enignelang_ast* node = new enignelang_ast();
+    
     node->name = name; node->node_id = node_id; node->node_type = syn;
 
     for(; this->index < this->current.size();) {
@@ -60,7 +61,7 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                                             enignelang_ast* from) noexcept {
     for(; this->index < this->current.size(); ++this->index) {
         auto token = this->current[this->index];
-
+        
         switch(token.token_type) {
             case enignelang_syntax::Ast:
             case enignelang_syntax::Div:
@@ -82,6 +83,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                         arg_handle.back()->node_type
                         );
 
+                node->row = token.row;
+                node->column = token.column;
                 
                 node->node_l = arg_handle.back();
                 arg_handle.pop_back();
@@ -108,7 +111,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast("bin_comp",
                                                           "bin_comp",
                                                           enignelang_syntax::BinComp);
-
+                node->row = token.row;
+                node->column = token.column;
+                
                 node->node_l = new enignelang_ast(
                         arg_handle.back()->name,
                         arg_handle.back()->node_id,
@@ -149,7 +154,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                         enignelang_ast* node = new enignelang_ast("array",
                                                           "array",
                                                           enignelang_syntax::LeftBPr);
-                        
+                        node->row = token.row;
+                        node->column = token.column;
+
                         while(this->check_index() && 
                             (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
                             if(this->current[this->index].token_type == enignelang_syntax::LeftBPr) {
@@ -191,6 +198,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast("array",
                                                           "array",
                                                           enignelang_syntax::LeftBPr);
+                node->row = token.row;
+                node->column = token.column;
+
                 // [5, 3, [5, 2]]
                 while(this->check_index() && 
                             (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
@@ -237,6 +247,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                     enignelang_ast* node = new enignelang_ast("argument_separator",
                                                               "argument_separator",
                                                               enignelang_syntax::Comma);
+                    node->row = token.row;
+                    node->column = token.column;
+                    
                     arg_handle.push_back(std::forward<enignelang_ast*>(node));
                     break;
                 }
@@ -283,6 +296,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                           "variant_literal",
                                                           enignelang_syntax::VariantLit);
+                node->row = token.row;
+                node->column = token.column;
+
                 node->node_current = token.token;
 
                 if(token.token.length() > 3 && (token.token == "argc" ||
@@ -315,7 +331,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                     enignelang_ast* node = new enignelang_ast(previous_token.token,
                                                               "inline_function_call",
                                                               enignelang_syntax::FunctionCall);
-                    
+                    node->row = token.row;
+                    node->column = token.column;
+
                     ++this->index;
 
                     if(this->check_index() && this->current[this->index].token_type != enignelang_syntax::RightPr) {
@@ -377,7 +395,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                             "inline_function_call",
                                                              token.token_type);
-                
+                node->row = token.row;
+                node->column = token.column;
+
                 ++this->index;
 
                 if(this->current[this->index].token_type != enignelang_syntax::LeftPr) {
@@ -456,6 +476,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast("",
                                                           "function_variant_argument",
                                                           enignelang_syntax::FunctionVariant);
+                node->row = token.row;
+                node->column = token.column;
 
                 if(auto val = this->current[++this->index]; enignelang_syntax::is_valid_number(val.token)) {
                     node->name = val.token;
@@ -498,6 +520,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 enignelang_ast* node = new enignelang_ast("constant",
                                                           "string_constant",
                                                           enignelang_syntax::Constant);
+                node->row = token.row;
+                node->column = token.column;
+                
                 if(enignelang_syntax::is_valid_number(token.token)) {
                     node->node_current = std::to_string(
                         enignelang_syntax::return_num(token.token));
@@ -578,6 +603,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                             enignelang_syntax::Element
                         );
 
+                        node->row = token.row;
+                        node->column = token.column;
 
                         std::vector<enignelang_ast*> __args__;
                         node->other.push_back(this->handle_single_argument(__args__, node));
@@ -629,7 +656,9 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                     enignelang_ast* node = new enignelang_ast(this->current[this->index].token,
                                                           "function_decl",
                                                           enignelang_syntax::Function);
-
+                    node->row = token.row;
+                    node->column = token.column;
+                    
                     ++this->index;
                     if(this->current[this->index].token_type == enignelang_syntax::Eq) {
                         ++this->index;
@@ -667,6 +696,9 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                           "return_statement",
                                                           enignelang_syntax::Return);
+                node->row = token.row;
+                node->column = token.column;
+
                 if(this->check_index() && (
                     this->current[this->index + 1].token_type != enignelang_syntax::Sem
                     || (__node__ != nullptr && __node__->node_type == enignelang_syntax::GlobalNode)))
@@ -684,6 +716,9 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                           "break",
                                                           enignelang_syntax::Break);
+                node->row = token.row;
+                node->column = token.column;
+
                 __node__->other.push_back(std::forward<enignelang_ast*>(node));
                 if(this->current[++this->index].token_type != enignelang_syntax::Sem) {
                     std::cout << "error found at break; <-\n";
@@ -697,6 +732,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast("",
                                                           "function_variant_argument",
                                                           enignelang_syntax::FunctionVariant);
+                node->row = token.row;
+                node->column = token.column;
 
                 if(auto val = this->current[this->index++]; enignelang_syntax::is_valid_number(val.token)) {
                     node->name = val.token;
@@ -713,7 +750,10 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast(this->current[++this->index].token,
                                                           "variant_decl",
                                                           enignelang_syntax::Variant);
-                
+
+                node->row = token.row;
+                node->column = token.column;
+
                 if(this->current[++this->index].token_type == enignelang_syntax::Eq) {
                     ++this->index;
                     arg_handle.clear();
@@ -738,7 +778,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast(this->current[this->index++].token,
                                                           "variant_chng",
                                                           enignelang_syntax::Variant);
-
+                node->row = token.row;
+                node->column = token.column;
                 
                 if(this->current[this->index].token_type == enignelang_syntax::Eq) {
                     ++this->index;
@@ -766,6 +807,10 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                                 enignelang_ast* node = new enignelang_ast(token.token,
                                                           "function_call",
                                                           enignelang_syntax::FunctionCall);
+
+                                node->row = token.row;
+                                node->column = token.column;
+
                                 for(; this->index < this->current.size();) {
                                     if(this->current[++this->index].token_type == enignelang_syntax::LeftPr) {
                                         ++this->index;
@@ -827,6 +872,9 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast("if",
                                                           "if_statement",
                                                           enignelang_syntax::If);
+                node->row = token.row;
+                node->column = token.column;
+
                 ++this->index; this->is_if = true;
                 node->node_l = new enignelang_ast("if",
                                                   "[node: left]if_statement",
@@ -905,6 +953,9 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 enignelang_ast* node = new enignelang_ast("loopif",
                                                           "loopif_statement",
                                                           enignelang_syntax::LoopIf);
+                node->row = token.row;
+                node->column = token.column;
+
                 ++this->index; this->is_if = true;
                 node->node_l = new enignelang_ast("loopif",
                                                   "[node: left]loopif_statement",
@@ -981,7 +1032,11 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::Print: {
                 enignelang_ast* node = new enignelang_ast("print",
                                                           "[built-in]function_call",
-                                                          enignelang_syntax::Print);
+                                                          enignelang_syntax::Print);    
+
+                node->row = token.row;
+                node->column = token.column;
+                
                 for(; this->index < this->current.size();) {
                     if(this->current[++this->index].token_type == enignelang_syntax::LeftPr) {
                         ++this->index;
