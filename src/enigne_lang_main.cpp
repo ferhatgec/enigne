@@ -77,6 +77,17 @@ int main(int argc, char** argv) {
     main.parser.parse(main.syntax);
     
     enignelang_intptr data(main.parser.ast_main);
+
+    /*
+        // an example for handling callbacks at runtime
+        data.callback_signal = [](enignelang_syntax::enignelang_tokens syn, enignelang_ast* node) {
+        switch(syn) {
+            case enignelang_syntax::Print: {
+                break;
+            }
+        }
+    };*/
+
     data.parser = main.parser;
     data.walk(main.parser.ast_main, main.parser.ast_main, enignelang_syntax::GlobalNode,
               main.parser.ast_main->func_args);

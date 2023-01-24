@@ -10,6 +10,7 @@
 #include "enigne_lang_main.hpp"
 #include <stack>
 #include <iostream>
+#include <functional>
 
 constexpr std::uint8_t recursion_limit = 255;
 
@@ -28,6 +29,9 @@ class enignelang_intptr {
 public:
     enignelang_ast* main_structure, *jump;
     enignelang_parse parser;
+
+    std::function<void(enignelang_syntax::enignelang_tokens, enignelang_ast*)> 
+        callback_signal;
 public:
     enignelang_intptr(enignelang_ast* data) : main_structure(data) {
         this->parser.ast_main = data;
@@ -53,6 +57,13 @@ public:
     std::string mul(const std::string& left, const std::string& right) noexcept;
     std::string mod(const std::string& left, const std::string& right) noexcept;
     
+    void callback_method(enignelang_syntax::enignelang_tokens syn, enignelang_ast* node) {
+        if(!this->callback_signal)
+            return;
+
+        this->callback_signal(syn, node); 
+    }
+
     std::string get_variant_data(const std::string name) noexcept {
         if(name == "+" || name == "-"
         || name == "/" || name == "*"

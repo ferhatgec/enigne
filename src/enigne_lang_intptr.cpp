@@ -55,27 +55,33 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
 
         switch(expr->node_current.front()) {
             case '+': {
-                // ya tam sayi ise ne yapacaksin lmao
+                this->callback_method(enignelang_syntax::Plus, expr);
                 return this->add(left_val, right_val);
             }
 
             case '-': {
+                this->callback_method(enignelang_syntax::Minus, expr);
                 return this->sub(left_val, right_val);
             }
 
             case '/': {
+                this->callback_method(enignelang_syntax::Div, expr);
                 return this->div(left_val, right_val);
             }
 
             case '*': {
+                this->callback_method(enignelang_syntax::Ast, expr);
                 return this->mul(left_val, right_val);
             }
 
             case '%': {
+                this->callback_method(enignelang_syntax::Mod, expr);
                 return this->mod(left_val, right_val);
             }
         }
     } else if(expr->node_type == enignelang_syntax::BinComp) {
+        this->callback_method(expr->node_type, expr);
+
         auto left_val = this->handle_expr(expr->node_l);
         auto right_val = this->handle_expr(expr->node_r);
 
@@ -118,6 +124,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             // $(0 + 2)
         }
     } else if(expr->node_type == enignelang_syntax::FunctionCall) {
+        this->callback_method(expr->node_type, expr);
+
         for(auto& Val : expr->other) {
             if(Val == nullptr) continue;
             if(Val->node_type == enignelang_syntax::Argument) {
@@ -193,6 +201,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             }
         }
     } else if(expr->node_type == enignelang_syntax::LeftBPr) {
+        this->callback_method(expr->node_type, expr);
+
         std::string __data__ = "[";
 
         for(auto& val: expr->other) {
@@ -204,6 +214,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
 
         return __data__ + "]";
     } else if(expr->node_type == enignelang_syntax::Element) {
+        this->callback_method(expr->node_type, expr);
+
         for(auto& val: this->global_variants) {
             if(val->name == expr->name) {
                 if(val->other.empty()) return "";
@@ -234,6 +246,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             }
         }
     } if(expr->node_type == enignelang_syntax::IsFile) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } else {
@@ -241,6 +255,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return std::to_string(static_cast<long double>(enignelang_fs::is_file(val)));
         }
     } else if(expr->node_type == enignelang_syntax::IsDir) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } else {
@@ -248,6 +264,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return std::to_string(static_cast<long double>(enignelang_fs::is_dir(val)));
         }
     } else if(expr->node_type == enignelang_syntax::IsSymlink) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } else {
@@ -255,6 +273,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return std::to_string(static_cast<long double>(enignelang_fs::is_symlink(val)));
         }
     } else if(expr->node_type == enignelang_syntax::PathExists) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } else {
@@ -262,6 +282,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return std::to_string(static_cast<long double>(enignelang_fs::path_exists(val)));
         }
     } else if(expr->node_type == enignelang_syntax::ReadFile) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "";
         } else {
@@ -274,6 +296,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             }
         }
     } else if(expr->node_type == enignelang_syntax::Exec) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "";
         } else {
@@ -282,11 +306,15 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return enignelang_system::output(val);
         }
     } else if(expr->node_type == enignelang_syntax::Exit) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty())
             std::exit(1);
         
         std::exit(0);
     } else if(expr->node_type == enignelang_syntax::Length) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } else {
@@ -315,24 +343,32 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return std::to_string(static_cast<long double>(this->remove_hints(val).length()));
         }
     } else if(expr->node_type == enignelang_syntax::Absolute) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } 
         
         return enignelang_math::abs(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::Ceil) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } 
         
         return enignelang_math::ceil(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::Floor) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } 
         
         return enignelang_math::floor(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::Logarithm) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.size() < 2) {
             return "0";
         } 
@@ -340,6 +376,8 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         return enignelang_math::log(
             this->remove_hints(this->handle_expr(expr->other[0])), this->remove_hints(this->handle_expr(expr->other[1])));
     } else if(expr->node_type == enignelang_syntax::SquareRoot) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "0";
         } 
@@ -347,34 +385,48 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         return enignelang_math::sqrt(
             this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::Pi) {
+        this->callback_method(expr->node_type, expr);
+
         return enignelang_math::pi();    
     } else if(expr->node_type == enignelang_syntax::Euler) {
+        this->callback_method(expr->node_type, expr);
+        
         return enignelang_math::e();
     } else if(expr->node_type == enignelang_syntax::StartsWith) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "";
         } 
         
         return enignelang_chars::starts_with(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::EndsWith) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "";
         } 
         
         return enignelang_chars::ends_with(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::ToUpper) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "";
         } 
         
         return enignelang_chars::to_upper(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::ToLower) {
+        this->callback_method(expr->node_type, expr);
+
         if(expr->other.empty()) {
             return "";
         } 
         
         return enignelang_chars::to_lower(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::CharInput) {
+        this->callback_method(expr->node_type, expr);
+
         return enignelang_system::char_input();
     }
 
@@ -385,7 +437,9 @@ enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var,
                                              const std::string& variable_name) noexcept {
     if(var == nullptr) return nullptr;
     
-    if(var->node_type == enignelang_syntax::BinOp) {
+    this->callback_method(var->node_type, var);
+
+    if(var->node_type == enignelang_syntax::BinOp) {    
         auto left_val = this->handle_var(var->node_l, variable_name);
         auto right_val = this->handle_var(var->node_r, variable_name);
     } else if(var->node_type == enignelang_syntax::BinComp) {
@@ -559,8 +613,11 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
     switch(node->node_type) {
         case enignelang_syntax::Print: {
+            this->callback_method(node->node_type, node);
+            
             for(auto data: node->other) {
                 if(data == nullptr) continue;
+                
                 ret: switch(data->node_type) {
                     case enignelang_syntax::Constant: {
                         if(!data->node_current.empty() && ((data->node_current.front() == '\'' && data->node_current.back() == '\'')
@@ -718,6 +775,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::Return: {
+            this->callback_method(node->node_type, node);
+
             if(this->jump != nullptr && !this->jump->other.empty()) {
                 if(auto& last = this->jump->other.back(); last->name == "_return_control_") {
                     last->node_current = this->handle_expr(node->other[0]);
@@ -727,6 +786,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::FunctionCall: {
+            this->callback_method(node->node_type, node);
+
             for(auto& Val : node->other) {
                 if(Val == nullptr) continue;
                 if(Val->node_type == enignelang_syntax::Argument) {
@@ -793,6 +854,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::If: {
+            this->callback_method(node->node_type, node);
+
             // this->jump = new enignelang_ast();
             // for(auto& val : from->other) {
             //     std::cout << val->node_id << '\n';
@@ -904,8 +967,11 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::LoopIf: {
+            this->callback_method(node->node_type, node);
+
             this->jump = new enignelang_ast();
             this->jump->other.assign(from->other.begin(), from->other.end());
+            
             if(node->node_current == "equal_to") {
                 if(this->handle_expr(node->node_l)
                      == this->handle_expr(node->node_r)) {
@@ -1036,6 +1102,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::Exec: {
+            this->callback_method(node->node_type, node);
+
             for(auto& data: node->other) {
                 switch(data->node_type) {
                     case enignelang_syntax::Constant: {
@@ -1068,6 +1136,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::Exit: {
+            this->callback_method(node->node_type, node);
+
             if(node->other.empty())
                 std::exit(1);
             
@@ -1075,11 +1145,15 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::CharInput: {
+            this->callback_method(node->node_type, node);
+
             ::getchar();
             break;
         }
         
         case enignelang_syntax::Variant: {
+            this->callback_method(node->node_type, node);
+
             for(auto& data: this->global_variants) {
                 if(data->name == node->name) {
                     enignelang_ast* test = node->other.back();
