@@ -772,6 +772,62 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 break;
             }
 
+            // <enum_token> =
+            //  Val,
+            //  Val2,
+            //  Val3
+            // ;
+            case enignelang_syntax::Enum: {
+                if(this->current[++this->index].token_type == enignelang_syntax::Eq) {
+                    unsigned count = 0;
+
+                    do {
+                        if(this->current[++this->index].token_type == enignelang_syntax::VariantLit
+                            || this->current[--this->index].token_type == enignelang_syntax::Comma) {
+                            enignelang_ast* node = new enignelang_ast(this->current[this->index].token,
+                                                          "variant_decl",
+                                                          enignelang_syntax::Variant);
+                            
+                            enignelang_ast* value = new enignelang_ast(this->current[this->index].token,
+                                                          "constant",
+                                                          enignelang_syntax::Constant);
+                            value->node_current = std::to_string(count);
+                                                                                  
+                            node->row = token.row;
+                            node->column = token.column;
+                            node->other.push_back(std::forward<enignelang_ast*>(value));
+
+                            __node__->other.push_back(std::forward<enignelang_ast*>(node));
+
+                            ++count;
+                        } else {
+                            std::cerr << "syntax error found at " << 
+                                this->current[this->index].row << ":" <<
+                                this->current[this->index].column << 
+                                " because there's no variant name before ',' or no ',' after the name; should be like this:\n" <<
+                                " enum =\n" <<
+                                "  Name,\n" <<
+                                "  OtherName,\n" <<
+                                "  AnotherName\n" <<
+                                " ; # please consider using this template to use enumerations."; 
+                            std::exit(1);
+                        }
+
+                        ++this->index;
+                    } while(this->check_index() 
+                        && this->current[this->index].token_type != enignelang_syntax::Sem);
+                } else {
+                    std::cerr << "'enum' keyword found at " << 
+                                this->current[this->index].row << ":" <<
+                                this->current[this->index].column << 
+                                "but '=' not found, consider adding this to code base.\n";
+                    std::exit(1);
+                }
+
+
+                break;
+            }
+
             case enignelang_syntax::Tilde: {
                 ++this->index;
 

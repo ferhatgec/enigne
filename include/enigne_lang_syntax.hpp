@@ -34,6 +34,7 @@ public:
         If, // if
         Elif, // elif
         Else, // else
+        Enum, // enum
         BuiltIn, // built_in
         Print, // print
         Exec, // exec
@@ -146,6 +147,8 @@ Undefined = -1
             IMPL_TOKEN("if", this->If),
             IMPL_TOKEN("elif", this->Elif),
             IMPL_TOKEN("else", this->Else),
+
+            IMPL_TOKEN("enum", this->Enum),
 
             IMPL_TOKEN("built_in", this->BuiltIn),
             IMPL_TOKEN("print", this->Print),

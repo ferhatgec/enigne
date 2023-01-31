@@ -1,6 +1,22 @@
 global primes = [2, 3, 5, 7, 11, 13, 17, 19];
 global gech = "gech";
 
+enum =
+  Zero,
+  One,
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+  Seven,
+  Eight,
+  Nine,
+  TheseDigitsAreEnoughForDoingMath
+;
+
+print(Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, "\n");
+
 if (primes.0 + primes.1) equal_to primes.2 =
  print(gech.0 + gech.1 + gech.2 + gech.3 + gech.4 + gech.5, "\n");
 ;
