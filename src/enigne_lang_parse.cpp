@@ -1,13 +1,10 @@
 // MIT License
 //
-// Copyright (c) 2022 Ferhat Geçdoğan All Rights Reserved.
+// Copyright (c) 2022-2023 Ferhat Geçdoğan All Rights Reserved.
 // Distributed under the terms of the MIT License.
 //
 
 #include "../include/enigne_lang_parse.hpp"
-#include <iostream>
-#include <algorithm>
-#include "../include/enigne_lang_intptr.hpp"
 #include "../libs/idkformat/include/idk.hpp"
 
 void enignelang_parse::parse(enignelang_syntax syn) noexcept {
@@ -95,7 +92,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             }
 
             case enignelang_syntax::NotEqualTo:
-            case enignelang_syntax::EqualTo: {
+            case enignelang_syntax::EqualTo:
+            case enignelang_syntax::And:
+            case enignelang_syntax::Or: {
                 if(arg_handle.size() == 0) {
                     break;
                 }

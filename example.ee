@@ -17,6 +17,12 @@ enum =
 
 print(Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, "\n");
 
+if (((One equal_to One) and (Two equal_to Two))
+    or (Nine equal_to Zero)) equal_to true =
+ print("(((One equal_to One) and (Two equal_to Two)) or (Nine equal_to Zero)) equal_to true\n");
+;
+
+
 if (primes.0 + primes.1) equal_to primes.2 =
  print(gech.0 + gech.1 + gech.2 + gech.3 + gech.4 + gech.5, "\n");
 ;
@@ -57,9 +63,9 @@ print(ceil(3.7), " ", floor(3.7), "\n");
 print(log(16, 2), " ", log(0, 0), " ", log(16, 1), "\n");
 print(sqrt(16), " ", sqrt(2), " ", sqrt(-1), "\n");
 print(pi(), " ", e(), " ", pi() * e(), "\n");
-print(to_lower("ENIGNE"), " ", 
-      to_upper("lang"), " ", 
-      starts_with("enigne"), " ", 
+print(to_lower("ENIGNE"), " ",
+      to_upper("lang"), " ",
+      starts_with("enigne"), " ",
       ends_with("enigne"), " ",
       starts_with("enigne") equal_to ends_with("enigne"), "\n");
 

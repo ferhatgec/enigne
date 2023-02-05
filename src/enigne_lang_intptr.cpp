@@ -1,24 +1,23 @@
 // MIT License
 //
-// Copyright (c) 2022 Ferhat Geçdoğan All Rights Reserved.
+// Copyright (c) 2022-2023 Ferhat Geçdoğan All Rights Reserved.
 // Distributed under the terms of the MIT License.
 //
 
 #include "../include/enigne_lang_intptr.hpp"
-#include "../include/enigne_lang_syntax.hpp"
 #include "../include/modules/enigne_lang_chars.hpp"
 #include "../include/modules/enigne_lang_fs.hpp"
 #include "../include/modules/enigne_lang_system.hpp"
 #include "../include/modules/enigne_lang_math.hpp"
-#include <iostream>
-#include <any>
-#include <ranges>
 #include <cmath>
 
-enignelang_ast* prev;
+const std::string true_str =
+        std::to_string(static_cast<long double>(1));
+
+const std::string false_str =
+        std::to_string(static_cast<long double>(0));
 
 unsigned index = 0;
-std::string current_data;
 
 void enignelang_intptr::expand(enignelang_ast* node) noexcept {
     if(node == nullptr) return;
@@ -86,11 +85,14 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         auto right_val = this->handle_expr(expr->node_r);
 
         if(expr->node_current.empty()) return "";
-
         if(expr->node_current == "equal_to") {
-            return (left_val == right_val) ? std::to_string(static_cast<long double>(1)) : "0";
+            return (left_val == right_val) ? true_str : false_str;
         } else if(expr->node_current == "not_equal_to") {
-            return (left_val != right_val) ? std::to_string(static_cast<long double>(1)) : "0";
+            return (left_val != right_val) ? true_str : false_str;
+        } else if(expr->node_current == "or") {
+            return ((left_val == true_str) || (right_val == true_str)) ? true_str : false_str;
+        } else if(expr->node_current == "and") {
+            return ((left_val == true_str) && (right_val == true_str)) ? true_str : false_str;
         }
     } else if(expr->node_type == enignelang_syntax::Constant) {
         return expr->node_current;
@@ -249,7 +251,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         this->callback_method(expr->node_type, expr);
 
         if(expr->other.empty()) {
-            return "0";
+            return false_str;
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
             return std::to_string(static_cast<long double>(enignelang_fs::is_file(val)));
@@ -258,7 +260,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         this->callback_method(expr->node_type, expr);
 
         if(expr->other.empty()) {
-            return "0";
+            return false_str;
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
             return std::to_string(static_cast<long double>(enignelang_fs::is_dir(val)));
@@ -267,7 +269,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         this->callback_method(expr->node_type, expr);
 
         if(expr->other.empty()) {
-            return "0";
+            return false_str;
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
             return std::to_string(static_cast<long double>(enignelang_fs::is_symlink(val)));
@@ -276,7 +278,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
         this->callback_method(expr->node_type, expr);
 
         if(expr->other.empty()) {
-            return "0";
+            return false_str;
         } else {
             auto val = this->remove_hints(this->handle_expr(expr->other[0]));
             return std::to_string(static_cast<long double>(enignelang_fs::path_exists(val)));

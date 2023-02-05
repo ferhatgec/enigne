@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Ferhat Geçdoğan All Rights Reserved.
+// Copyright (c) 2022-2023 Ferhat Geçdoğan All Rights Reserved.
 // Distributed under the terms of the MIT License.
 //
 
@@ -31,9 +31,14 @@ public:
         Return, // return
         ConstEval, // const_eval
         Global, // global
+
         If, // if
         Elif, // elif
         Else, // else
+
+        And, // and
+        Or, // or
+
         Enum, // enum
         BuiltIn, // built_in
         Print, // print
@@ -147,6 +152,9 @@ Undefined = -1
             IMPL_TOKEN("if", this->If),
             IMPL_TOKEN("elif", this->Elif),
             IMPL_TOKEN("else", this->Else),
+
+            IMPL_TOKEN("and", this->And),
+            IMPL_TOKEN("or", this->Or),
 
             IMPL_TOKEN("enum", this->Enum),
 

@@ -1,12 +1,11 @@
 // MIT License
 //
-// Copyright (c) 2022 Ferhat Geçdoğan All Rights Reserved.
+// Copyright (c) 2022-2023 Ferhat Geçdoğan All Rights Reserved.
 // Distributed under the terms of the MIT License.
 //
 
 #include "../include/enigne_lang_syntax.hpp"
 #include "../libs/escafe/include/escafe.hpp"
-#include <iostream>
 
 enignelang_syntax::enignelang_tokens enignelang_syntax::match(std::string val) noexcept {
     auto result = this->tokens.find(val);

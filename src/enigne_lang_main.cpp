@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Ferhat Geçdoğan All Rights Reserved.
+// Copyright (c) 2022-2023 Ferhat Geçdoğan All Rights Reserved.
 // Distributed under the terms of the MIT License.
 //
 
@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
             variants.push_back(__constant);
         } else {
             file_name = std::string(argv[i]);
+            break; // others are scripts arguments.
         }
     }
 
