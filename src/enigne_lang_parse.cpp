@@ -94,7 +94,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::NotEqualTo:
             case enignelang_syntax::EqualTo:
             case enignelang_syntax::And:
-            case enignelang_syntax::Or: {
+            case enignelang_syntax::Or:
+            case enignelang_syntax::IsIn: {
                 if(arg_handle.size() == 0) {
                     break;
                 }

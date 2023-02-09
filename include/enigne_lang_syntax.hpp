@@ -36,6 +36,7 @@ public:
         Elif, // elif
         Else, // else
 
+        IsIn, // is_in
         And, // and
         Or, // or
 
@@ -47,7 +48,6 @@ public:
         NotEqualTo, // not_equal_to
         GreaterThan, // greater_than
         LessThan, // less_than
-
 
         True, // true
         False, // false
@@ -153,6 +153,7 @@ Undefined = -1
             IMPL_TOKEN("elif", this->Elif),
             IMPL_TOKEN("else", this->Else),
 
+            IMPL_TOKEN("is_in", this->IsIn),
             IMPL_TOKEN("and", this->And),
             IMPL_TOKEN("or", this->Or),
 

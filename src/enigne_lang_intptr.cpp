@@ -93,6 +93,21 @@ std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
             return ((left_val == true_str) || (right_val == true_str)) ? true_str : false_str;
         } else if(expr->node_current == "and") {
             return ((left_val == true_str) && (right_val == true_str)) ? true_str : false_str;
+        } else if(expr->node_current == "is_in") {
+            if(expr->node_r->node_type == enignelang_syntax::LeftBPr) {
+                for(auto& val: expr->node_r->other) {
+                    if((left_val == this->handle_expr(val))
+                        || (expr->node_l == val)) {
+                        return true_str;
+                    }
+                }
+            }
+
+            if(left_val == right_val) {
+                return true_str;
+            }
+
+            return false_str;
         }
     } else if(expr->node_type == enignelang_syntax::Constant) {
         return expr->node_current;

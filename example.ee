@@ -15,6 +15,10 @@ enum =
   TheseDigitsAreEnoughForDoingMath
 ;
 
+if (Zero is_in [Zero, One, Two, Three, Four]) equal_to true =
+ print("(Zero is_in [Zero, One, Two, Three, Four]) equal_to true\n");
+;
+
 print(Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, "\n");
 
 if (((One equal_to One) and (Two equal_to Two))
