@@ -1118,25 +1118,29 @@ void enignelang_intptr::walk(enignelang_ast* node,
             break;
         }
 
-        case enignelang_syntax::Exec: {
+          case enignelang_syntax::Exec: {
             this->callback_method(node->node_type, node);
+
+            std::string cmd_and_its_parameters = "";
 
             for(auto& data: node->other) {
                 switch(data->node_type) {
                     case enignelang_syntax::Constant: {
-                        std::system(data->node_current.c_str());
+                        cmd_and_its_parameters.append(
+                            this->remove_hints(data->node_current));
                         break;
                     }
 
                     case enignelang_syntax::BinOp: {
-                        std::system(this->handle_expr(data).c_str());
+                        cmd_and_its_parameters.append(this->remove_hints(this->handle_expr(data)));
                         break;
                     }
 
                     case enignelang_syntax::VariantLit: {
                         for(auto& val: this->global_variants) {
                             if(val->name == data->name) {
-                                std::system(this->remove_hints(this->handle_expr(val->other.back())).c_str());
+                                cmd_and_its_parameters.append(
+                                    this->remove_hints(this->handle_expr(val->other.back())));
                                 break;
                             }
                         }
@@ -1148,9 +1152,12 @@ void enignelang_intptr::walk(enignelang_ast* node,
                     }
                 }
             }
+        
+            std::system(cmd_and_its_parameters.c_str());
 
             break;
         }
+        
 
         case enignelang_syntax::Exit: {
             this->callback_method(node->node_type, node);
