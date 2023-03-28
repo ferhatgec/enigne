@@ -1,6 +1,18 @@
 global primes = [2, 3, 5, 7, 11, 13, 17, 19];
 global gech = "gech";
 
+global array = [primes.0, [primes.1]];
+global copy_element = array.1; # there's no still array.0.n; like syntax.
+
+print(copy_element, "\n");
+print(copy_element.0, "\n");
+
+global x = "";
+~x = array.1;
+
+print(x, "\n");
+
+
 enum =
   Zero,
   One,

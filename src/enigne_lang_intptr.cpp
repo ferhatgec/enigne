@@ -23,7 +23,10 @@ void enignelang_intptr::expand(enignelang_ast* node) noexcept {
     if(node == nullptr) return;
 
     std::cout << "[";
+
     for(auto& val: node->other) {
+        val = this->copy_array_elements(val);
+
         if(val->node_type == enignelang_syntax::LeftBPr) {
             this->expand(val);
         } else if(val->node_type == enignelang_syntax::Constant) {
@@ -38,8 +41,10 @@ void enignelang_intptr::expand(enignelang_ast* node) noexcept {
     std::cout << "]";
 }
 
-std::string enignelang_intptr::handle_expr(enignelang_ast *expr) noexcept {
+std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
     if(expr == nullptr) return "";
+    
+    expr = this->copy_array_elements(expr);
 
     if(expr->node_type == enignelang_syntax::BinOp) {
         if((expr->node_l != nullptr && expr->node_l->node_type == enignelang_syntax::LeftBPr)
@@ -481,9 +486,31 @@ enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var,
                 }
             }
         }
+    } else if(var->node_type == enignelang_syntax::Element) {
+        var = this->copy_array_elements(var);  
     } return var;
 }
 
+
+enignelang_ast* enignelang_intptr::copy_array_elements(enignelang_ast* node) noexcept {
+    if(node->node_type == enignelang_syntax::Element) {
+        for(auto& val: this->global_variants) {
+            if(val->name == node->name) {
+                if(!val->other.empty() && 
+                    (val->other.back() != nullptr) && val->other.back()->node_type == enignelang_syntax::LeftBPr) {
+                    const std::size_t indx = static_cast<std::size_t>(
+                            enignelang_syntax::return_num(this->handle_expr(node->other.back())));
+
+                    if(indx < val->other.back()->other.size()) {
+                        return val->other.back()->other[indx];
+                    }
+                }
+            }
+        }
+    }
+
+    return node;
+}
 
 std::string enignelang_intptr::add(const std::string &left, const std::string &right) noexcept {
     if(left.empty()) return right;
@@ -636,17 +663,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
                 if(data == nullptr) continue;
                 
                 ret: switch(data->node_type) {
-                    case enignelang_syntax::Constant: {
-                        if(!data->node_current.empty() && ((data->node_current.front() == '\'' && data->node_current.back() == '\'')
-                            || (data->node_current.front() == '"' && data->node_current.back() == '"'))) {
-                            data->node_current = data->node_current.substr(1, 
-                                                      data->node_current.length() - 2);
-                        }
-
-                        std::cout << this->remove_hints(data->node_current);
-                        break;
-                    }
-
+                    case enignelang_syntax::LeftBPr:
+                    case enignelang_syntax::Constant:
                     case enignelang_syntax::BinComp:
                     case enignelang_syntax::BinOp: {
                         std::cout << this->remove_hints(this->handle_expr(data));
@@ -670,11 +688,6 @@ void enignelang_intptr::walk(enignelang_ast* node,
                         break;
                     }
 
-                    // array
-                    case enignelang_syntax::LeftBPr: {
-                        this->expand(data);
-                        break;
-                    }
 
                     case enignelang_syntax::VariantLit: {
                          for(auto& val: this->global_variants) {
@@ -1181,7 +1194,6 @@ void enignelang_intptr::walk(enignelang_ast* node,
             for(auto& data: this->global_variants) {
                 if(data->name == node->name) {
                     enignelang_ast* test = node->other.back();
-
                     test = this->handle_var(test, node->name);
                     enignelang_ast* _val = new enignelang_ast("=", node->name, enignelang_syntax::Constant);
                     _val->node_current = this->handle_expr(test);
@@ -1192,10 +1204,15 @@ void enignelang_intptr::walk(enignelang_ast* node,
                 }
             }
 
-
             enignelang_ast* variant = new enignelang_ast(node->name,
                                                          "variant",
                                                          enignelang_syntax::Variant);
+
+            if(!node->other.empty() && node->other.back() != nullptr && 
+                node->other.back()->node_type == enignelang_syntax::Element) {
+                node->other.back() = this->copy_array_elements(node->other.back());
+            }
+
             variant->other.assign(node->other.begin(), node->other.end());
 
             this->global_variants.push_back(variant);

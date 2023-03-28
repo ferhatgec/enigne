@@ -45,8 +45,11 @@ public:
               std::vector<std::string> func_args) noexcept;
     
     void start() noexcept;
-    
+
+   
     std::string handle_expr(enignelang_ast* expr) noexcept;
+
+    enignelang_ast* copy_array_elements(enignelang_ast* node) noexcept;
     enignelang_ast* handle_var(enignelang_ast* var, const std::string& variable_name) noexcept;
     enignelang_ast* replace_handle_var(enignelang_ast* var, const std::string& variable_name) noexcept;
     
