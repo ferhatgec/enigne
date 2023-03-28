@@ -10,6 +10,7 @@
 #include "../include/modules/enigne_lang_system.hpp"
 #include "../include/modules/enigne_lang_math.hpp"
 #include <cmath>
+#include <fstream>
 
 const std::string true_str =
         std::to_string(static_cast<long double>(1));
@@ -1226,7 +1227,66 @@ void enignelang_intptr::walk(enignelang_ast* node,
     }
 }
 
+void enignelang_intptr::include_external_script(enignelang_ast* node) noexcept {
+    if(node == nullptr || node->name.empty()) return;
+
+    std::ifstream read_stream(
+        ((node->node_id == "include_script_src") ? std::filesystem::current_path().string() : "") 
+        + "/" + this->remove_hints(node->name));
+
+    if(!read_stream) return;
+
+    enignelang __main;
+    
+    for(std::string temp; std::getline(read_stream, temp);
+        __main.syntax.raw_file_data.append(temp + "\n"))
+        ; read_stream.close();
+
+    __main.syntax.tokenize();
+    __main.file(__main.syntax.raw_file_data);
+    __main.parser.parse(__main.syntax);
+    
+    //enignelang_intptr __data(__main.parser.ast_main);
+    std::vector<enignelang_ast*> list;
+
+    for(auto& val: __main.parser.ast_main->other) {
+        if(val->node_type == enignelang_syntax::Variant 
+            || val->node_type == enignelang_syntax::Function
+            || val->node_type == enignelang_syntax::Tilde) {
+            list.push_back(std::forward<enignelang_ast*>(val));
+        }
+    }
+
+    enignelang_include_info info;
+
+    info.info = list;
+    info.name = node->name;
+
+    include_infos.push_back(info);
+
+    //__data.parser = __main.parser;
+}
+
 void enignelang_intptr::start() noexcept {
+    for(std::size_t n = 0; n < this->main_structure->other.size(); ++n) {
+        if(this->main_structure->other[n]->node_type == enignelang_syntax::Include) {
+            this->include_external_script(this->main_structure->other[n]);
+        }
+    }
+
+    for(auto& info: this->include_infos) {
+        this->concatenate_include_infos.insert(this->concatenate_include_infos.end(),
+                                                info.info.begin(),
+                                                info.info.end());
+    }
+
+    this->concatenate_include_infos.insert(this->concatenate_include_infos.end(),
+                                            this->main_structure->other.begin(),
+                                            this->main_structure->other.end());
+
+    this->main_structure->other.clear();
+    this->main_structure->other.swap(this->concatenate_include_infos);
+
     for(; index < this->main_structure->other.size(); ++index) {
         if(auto val = this->main_structure->other[index]->node_type; val == enignelang_syntax::Function) {
             continue;

@@ -14,6 +14,12 @@
 
 constexpr std::uint8_t recursion_limit = 255;
 
+class enignelang_include_info {
+public:
+    std::vector<enignelang_ast*> info;
+    std::string name;
+};
+
 class enignelang_intptr {
     std::stack<enignelang_syntax::enignelang_tokens> def;
     std::vector<std::pair<std::string, std::string>> const_eval_functions;
@@ -26,8 +32,11 @@ class enignelang_intptr {
     std::uint8_t recursion_fn_call = 0;
     gechint rcrs_fn = 0;
 public:
-    std::vector<enignelang_ast*> jump_states, global_variants;
-    
+    std::vector<enignelang_ast*> concatenate_include_infos, 
+                                    global_variants;
+                                    
+    std::vector<enignelang_include_info> include_infos;
+
     enignelang_ast* main_structure, *jump;
     enignelang_parse parser;
 
@@ -52,7 +61,9 @@ public:
     enignelang_ast* copy_array_elements(enignelang_ast* node) noexcept;
     enignelang_ast* handle_var(enignelang_ast* var, const std::string& variable_name) noexcept;
     enignelang_ast* replace_handle_var(enignelang_ast* var, const std::string& variable_name) noexcept;
-    
+
+
+    void include_external_script(enignelang_ast* node) noexcept;
     void expand(enignelang_ast* node) noexcept;
     
     std::string add(const std::string& left, const std::string& right) noexcept;

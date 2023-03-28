@@ -1,3 +1,7 @@
+include $"header.ee"
+
+print(file_name, " ", :boolstr(false), " ", :boolstr(true), "\n");
+
 global primes = [2, 3, 5, 7, 11, 13, 17, 19];
 global gech = "gech";
 

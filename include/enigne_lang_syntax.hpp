@@ -52,6 +52,8 @@ public:
         True, // true
         False, // false
 
+        Include, // include
+
         Iterator, // ->
         VariantID, // @
         FunctionVariant, // $
@@ -170,6 +172,8 @@ Undefined = -1
 
             IMPL_TOKEN("true", this->True),
             IMPL_TOKEN("false", this->False),
+
+            IMPL_TOKEN("include", this->Include),
 
             IMPL_TOKEN("==", this->EqualTo),
             IMPL_TOKEN("!=", this->NotEqualTo),

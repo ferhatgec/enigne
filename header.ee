@@ -1,0 +1,11 @@
+# our variable to be included in example.ee
+global file_name = "example.ee";
+
+# our function to be included in example.ee
+f :boolstr =
+ if $0 equal_to true =
+  return "true";
+ ;
+
+ return "false";
+;

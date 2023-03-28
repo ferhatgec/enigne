@@ -828,6 +828,38 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 break;
             }
 
+
+            // include $"path" # uses current location to find script file.
+            // include "path" # uses root location to find script file.
+            case enignelang_syntax::Include: {
+                if(this->check_index()) {
+                    enignelang_ast* node = new enignelang_ast(
+                        this->current[this->index].token,
+                        "include_script",
+                        enignelang_syntax::Include
+                    );
+
+                    if(this->current[++this->index].token_type == enignelang_syntax::Constant) 
+                        node->name = this->current[this->index].token;
+                    else if(this->current[this->index].token_type == enignelang_syntax::FunctionVariant) {
+                        if(this->current[++this->index].token_type == enignelang_syntax::Constant) {
+                            node->name = this->current[this->index].token;
+                        } else {
+                            std::cout << "There's no include path after $\n";
+                            std::exit(1);
+                        }
+
+                        node->node_id = "include_script_src";
+                    }
+
+                    __node__->other.push_back(std::forward<enignelang_ast*>(
+                        node
+                    ));
+                }
+
+                break;
+            }
+
             case enignelang_syntax::Tilde: {
                 ++this->index;
 
