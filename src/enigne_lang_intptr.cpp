@@ -56,6 +56,14 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         enignelang_ast* left = expr->node_l, *right = expr->node_r;
         std::size_t left_indx = 0, right_indx = 0;
 
+        // if((left != nullptr && left->node_type == enignelang_syntax::BinOp)) {
+        //     this->handle_expr(left);
+        // }
+
+        // if((right != nullptr && right->node_type ==enignelang_syntax::BinOp)) {
+        //     this->handle_expr(right);
+        // }
+
         if((left != nullptr && (left->node_id == "variant_literal"
                                 || left->node_id == "constant"))) {
             for(auto& var: this->global_variants) {
@@ -67,6 +75,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
                 ++left_indx;
             }
         }
+
 
         if((right != nullptr && right->node_id == "variant_literal"
                                 || left->node_id == "constant")) {
@@ -115,10 +124,29 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         }
         // array + array
         else if((left != nullptr && left->node_type == enignelang_syntax::LeftBPr)
-            && right != nullptr && right->node_type && enignelang_syntax::LeftBPr) {
-            for(auto& val: right->other) {
-                this->global_variants[left_indx]->other.push_back(val);
+            && right != nullptr && right->node_type == enignelang_syntax::LeftBPr) {
+            for(auto& val: this->global_variants) {
+                if(val->name == expr->which_node) {
+                    for(auto& val: right->other)
+                        this->global_variants[left_indx]->other.back()->other.push_back(val);
+                    
+                    if(expr->which_node != this->global_variants[left_indx]->name) {
+                        enignelang_ast* copy_node = this->global_variants[left_indx];
+                        val->other.back()->other.clear();
+                        
+                        for(auto& data: copy_node->other.back()->other) {
+                            val->other.back()->other.push_back(data);
+                        }
+
+                        for(std::size_t _indx = 0; _indx < right->other.size(); ++_indx)                        
+                            this->global_variants[left_indx]->other.back()->other.pop_back();
+                    }
+
+                    break; 
+                }
             }
+
+            expr->which_node.clear();
 
             return "";
         }
