@@ -53,6 +53,76 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
             std::cout << "note: do not try to add constants directly to array\n";
         }
 
+        enignelang_ast* left = expr->node_l, *right = expr->node_r;
+        std::size_t left_indx = 0, right_indx = 0;
+
+        if((left != nullptr && (left->node_id == "variant_literal"
+                                || left->node_id == "constant"))) {
+            for(auto& var: this->global_variants) {
+                if(var->name == left->name) {
+                    left = var->other.back();
+
+                    break;
+                }
+                ++left_indx;
+            }
+        }
+
+        if((right != nullptr && right->node_id == "variant_literal"
+                                || left->node_id == "constant")) {
+            for(auto& var: this->global_variants) {
+                if(var->name == right->name) {
+                    right = var->other.back();
+                    break;
+                }
+                ++right_indx;
+            }
+        }
+        
+        // array + variant
+        if((left != nullptr && left->node_type == enignelang_syntax::LeftBPr)
+            && right != nullptr && right->node_type != enignelang_syntax::LeftBPr) {
+            for(auto& val: this->global_variants) {
+                if(val->name == expr->which_node) {
+                    this->global_variants[left_indx]->other.back()->other.push_back(right);
+                    
+                    if(expr->which_node != this->global_variants[left_indx]->name) {
+                        enignelang_ast* copy_node = this->global_variants[left_indx];
+                        val->other.back()->other.clear();
+                        
+                        for(auto& data: copy_node->other.back()->other) {
+                            val->other.back()->other.push_back(data);
+                        }
+
+                       this->global_variants[left_indx]->other.back()->other.pop_back();
+                    }
+
+                    break; 
+                }
+            }
+
+            expr->which_node.clear();
+
+            return "";
+        }
+        // variant + array
+        else if((right != nullptr && right->node_type == enignelang_syntax::LeftBPr)
+            && left != nullptr && left->node_type != enignelang_syntax::LeftBPr) {
+            // FIXME: Add array to variant as 
+            // string literal or integer depending on variant's type.
+
+            return "";
+        }
+        // array + array
+        else if((left != nullptr && left->node_type == enignelang_syntax::LeftBPr)
+            && right != nullptr && right->node_type && enignelang_syntax::LeftBPr) {
+            for(auto& val: right->other) {
+                this->global_variants[left_indx]->other.push_back(val);
+            }
+
+            return "";
+        }
+
         auto left_val = this->handle_expr(expr->node_l);
         auto right_val = this->handle_expr(expr->node_r);
 
@@ -458,7 +528,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
 
 enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var, 
                                              const std::string& variable_name) noexcept {
-    if(var == nullptr) return nullptr;
+    if(var == nullptr) return var;
     
     this->callback_method(var->node_type, var);
 
@@ -472,7 +542,7 @@ enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var,
         if(var->name == variable_name) {
             for(auto& val: this->global_variants) {
                 if(val->name == variable_name) {
-                   // if(!val->other.empty()) {
+                    if(!val->other.empty()) { // FIXME: Come here if something wrong 
                         var->node_type = enignelang_syntax::Constant;
                             
                         if(!val->other.empty() && 
@@ -482,7 +552,7 @@ enignelang_ast* enignelang_intptr::handle_var(enignelang_ast* var,
                             this->handle_var(val->other.back(), variable_name);
                             var->node_current = this->handle_expr(val->other.back());
                         }
-                    //} 
+                    } // FIXME: Come here if something wrong 
                     break;
                 }
             }
@@ -1196,10 +1266,14 @@ void enignelang_intptr::walk(enignelang_ast* node,
                 if(data->name == node->name) {
                     enignelang_ast* test = node->other.back();
                     test = this->handle_var(test, node->name);
+                    test->which_node = data->name;
                     enignelang_ast* _val = new enignelang_ast("=", node->name, enignelang_syntax::Constant);
                     _val->node_current = this->handle_expr(test);
-                    data->other.clear();
-                    data->other.push_back(_val);
+                    
+                    if(!test->which_node.empty()) {
+                        data->other.clear();
+                        data->other.push_back(_val);
+                    }
                     
                     return;
                 }
@@ -1212,6 +1286,11 @@ void enignelang_intptr::walk(enignelang_ast* node,
             if(!node->other.empty() && node->other.back() != nullptr && 
                 node->other.back()->node_type == enignelang_syntax::Element) {
                 node->other.back() = this->copy_array_elements(node->other.back());
+            } else if(!node->other.empty() && node->other.back() != nullptr && 
+                node->other.back()->node_type == enignelang_syntax::FunctionVariant) {
+                unsigned index = enignelang_syntax::return_num(node->other.back()->name); 
+                if(index < this->jump->other.size()) 
+                    node->other.back() = this->jump->other[index];
             }
 
             variant->other.assign(node->other.begin(), node->other.end());

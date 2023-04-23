@@ -64,6 +64,31 @@ if argc equal_to 1 =
  ;
 ;
 
+
+f :split =
+ global __var_index = 1;
+ global __split_keyword = "";
+ global __split_result = [];
+ global __lock_data = $0;
+
+ loopif __var_index not_equal_to len($0) + 1 =
+  if __lock_data.(__var_index) equal_to " " =
+   ~__split_result = __split_result + __split_keyword;
+   ~__split_keyword = "";
+  ; else =
+   ~__split_keyword = __split_keyword + __lock_data.(__var_index);
+  ;
+
+  ~__var_index = __var_index + 1;
+ ;
+
+ ~__split_result = __split_result + __split_keyword;
+
+ return __split_result;
+;
+
+print(:split("Hello dear splitter guy"), "\n");
+
 f :input =
  global var = "";
  global ch = "";
