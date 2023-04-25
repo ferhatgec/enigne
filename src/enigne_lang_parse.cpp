@@ -203,32 +203,33 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
 
                 // [5, 3, [5, 2]]
                 while(this->check_index() && 
-                            (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
-                            if(this->current[this->index].token_type == enignelang_syntax::LeftBPr) {
-                                std::vector<enignelang_ast*> _args;
-                                auto val = this->handle_single_argument(_args, node);
+                    (this->current[++this->index].token_type != enignelang_syntax::RightBPr)) {
+                    if(this->current[this->index].token_type == enignelang_syntax::LeftBPr) {
+                        std::vector<enignelang_ast*> _args;
+                        
+                        auto val = this->handle_single_argument(_args, node);
 
-                                if(val != nullptr) {
-                                    node->other.push_back(val);
-                                }
-
-                                if(this->current[this->index].token_type == enignelang_syntax::Sem) {
-                                    --this->index; --this->index; 
-                                }
-
-                                continue;
-                            } else if(this->current[this->index - 1].token_type == enignelang_syntax::RightBPr) {
-                                --this->index;
-                                break;
-                            }
-
-                            if(this->current[this->index].token_type == enignelang_syntax::Sem
-                                || this->current[this->index].token_type == enignelang_syntax::RightBPr) {
-                                break;
-                            }
-
-                            node->other.push_back(this->handle_single_argument(args, node));
+                        if(val != nullptr) {
+                            node->other.push_back(val);
                         }
+
+                        if(this->current[this->index].token_type == enignelang_syntax::Sem) {
+                            --this->index; --this->index; 
+                        }
+
+                        continue;
+                    } else if(this->current[this->index - 1].token_type == enignelang_syntax::RightBPr) {
+                        --this->index;
+                        break;
+                    }
+
+                    if(this->current[this->index].token_type == enignelang_syntax::Sem
+                        || this->current[this->index].token_type == enignelang_syntax::RightBPr) {
+                        break;
+                    }
+
+                    node->other.push_back(this->handle_single_argument(args, node));
+                }
                         
 
                 arg_handle.push_back(std::forward<enignelang_ast*>(node));
@@ -855,6 +856,38 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                     __node__->other.push_back(std::forward<enignelang_ast*>(
                         node
                     ));
+                }
+
+                break;
+            }
+
+            // delete "variant";
+            case enignelang_syntax::Delete: {
+                if(this->check_index()){ 
+                    if(auto val = this->current[++this->index];
+                        val.token_type == enignelang_syntax::Constant) {
+                        if(this->current[++this->index].token_type != enignelang_syntax::Sem) {
+                            std::cout << "expected semicolon after delete \"variant\" but got " 
+                                + this->current[this->index].token << '\n';
+                            std::exit(1);
+                        }
+
+                        enignelang_ast* node = new enignelang_ast(
+                            val.token,
+                            "delete_variant",
+                            enignelang_syntax::Delete
+                        );
+
+                        __node__->other.push_back(std::forward<enignelang_ast*>(
+                                node
+                        ));
+                    } else {
+                        std::cout << "expected string literal like this: delete \"variant\";\n";
+                        std::exit(1);
+                    }
+                } else {
+                    std::cout << "EOF before string literal\n";
+                    std::exit(1);
                 }
 
                 break;

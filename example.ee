@@ -16,6 +16,9 @@ global x = "";
 
 print(x, "\n");
 
+delete "x";
+
+print(x, "\n");
 
 enum =
   Zero,
