@@ -550,6 +550,14 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         this->callback_method(expr->node_type, expr);
 
         return enignelang_system::char_input();
+    } else if(expr->node_type == enignelang_syntax::ToString) {
+        this->callback_method(expr->node_type, expr);
+
+        if(expr->other.empty()) {
+            return "\"\"";
+        }
+
+        return "\"" + this->remove_hints(this->handle_expr(expr->other[0])) + "\"";
     }
 
     return "";
@@ -1285,6 +1293,13 @@ void enignelang_intptr::walk(enignelang_ast* node,
             this->callback_method(node->node_type, node);
 
             ::getchar();
+            break;
+        }
+
+        case enignelang_syntax::ToString: {
+            // nothing to do, out of scope. makes no sense
+            // TODO: support '-warnings' arg for pushing warning
+            // per unused variants, 'makes no sense' function calls etc.
             break;
         }
 

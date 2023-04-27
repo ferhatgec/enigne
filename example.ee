@@ -8,6 +8,10 @@ global gech = "gech";
 global array = [primes.0, [primes.1]];
 global copy_element = array.1; # there's no still array.0.n; like syntax.
 
+print(to_string(50), 
+      to_string("50"),
+      "\n");
+
 print(copy_element, "\n");
 print(copy_element.0, "\n");
 

@@ -111,6 +111,8 @@ public:
         ToLower, // to_lower
         ToUpper, // to_upper
         CharInput, // char_input
+
+        ToString, // to_string
 Undefined = -1
     };
 
@@ -243,7 +245,9 @@ Undefined = -1
             IMPL_TOKEN("ends_with", this->EndsWith),
             IMPL_TOKEN("to_lower", this->ToLower),
             IMPL_TOKEN("to_upper", this->ToUpper),
-            IMPL_TOKEN("char_input", this->CharInput)
+            IMPL_TOKEN("char_input", this->CharInput),
+
+            IMPL_TOKEN("to_string", this->ToString)
     };
 
     std::string raw_file_data;
