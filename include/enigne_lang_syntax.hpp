@@ -113,6 +113,7 @@ public:
         CharInput, // char_input
 
         ToString, // to_string
+        ToInt, // to_int
 Undefined = -1
     };
 
@@ -247,7 +248,8 @@ Undefined = -1
             IMPL_TOKEN("to_upper", this->ToUpper),
             IMPL_TOKEN("char_input", this->CharInput),
 
-            IMPL_TOKEN("to_string", this->ToString)
+            IMPL_TOKEN("to_string", this->ToString),
+            IMPL_TOKEN("to_int", this->ToInt)
     };
 
     std::string raw_file_data;

@@ -558,6 +558,17 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         }
 
         return "\"" + this->remove_hints(this->handle_expr(expr->other[0])) + "\"";
+    } else if(expr->node_type == enignelang_syntax::ToInt) {
+        this->callback_method(expr->node_type, expr);
+
+        if(expr->other.empty()) {
+            return false_str;
+        }
+
+        std::string _temp_str = this->remove_hints(this->handle_expr(expr->other[0]));
+        _temp_str = std::to_string(static_cast<std::int64_t>(enignelang_syntax::return_num(_temp_str)));
+
+        return std::to_string(enignelang_syntax::return_num(_temp_str));
     }
 
     return "";
@@ -1296,7 +1307,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
             break;
         }
 
-        case enignelang_syntax::ToString: {
+        case enignelang_syntax::ToString:
+        case enignelang_syntax::ToInt: {
             // nothing to do, out of scope. makes no sense
             // TODO: support '-warnings' arg for pushing warning
             // per unused variants, 'makes no sense' function calls etc.
