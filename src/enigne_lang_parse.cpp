@@ -394,7 +394,8 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::ToLower:
             case enignelang_syntax::CharInput:
             case enignelang_syntax::ToString:
-            case enignelang_syntax::ToInt: {
+            case enignelang_syntax::ToInt: 
+            case enignelang_syntax::TypeOf: {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                             "inline_function_call",
                                                              token.token_type);
@@ -1220,7 +1221,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::ToLower:
             case enignelang_syntax::CharInput: 
             case enignelang_syntax::ToString:
-            case enignelang_syntax::ToInt: {
+            case enignelang_syntax::ToInt:
+            case enignelang_syntax::TypeOf: {
                 __node__->other.push_back(
                         std::forward<enignelang_ast*>(this->impl_generic_fn_call(token.token, 
                                                                                 "[built-in]function_call", 

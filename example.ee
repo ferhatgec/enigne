@@ -16,6 +16,14 @@ print(to_int(50), " ",
       to_int("50"),
       "\n");
 
+    
+print(type_of(50), " ",
+      type_of("50"), " ",
+      type_of(["50"]), " ",
+      type_of(30 + 20), " ",
+      type_of(),
+      "\n");
+
 print(copy_element, "\n");
 print(copy_element.0, "\n");
 

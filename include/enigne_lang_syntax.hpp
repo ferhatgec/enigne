@@ -114,6 +114,7 @@ public:
 
         ToString, // to_string
         ToInt, // to_int
+        TypeOf, // type_of
 Undefined = -1
     };
 
@@ -249,7 +250,8 @@ Undefined = -1
             IMPL_TOKEN("char_input", this->CharInput),
 
             IMPL_TOKEN("to_string", this->ToString),
-            IMPL_TOKEN("to_int", this->ToInt)
+            IMPL_TOKEN("to_int", this->ToInt),
+            IMPL_TOKEN("type_of", this->TypeOf)
     };
 
     std::string raw_file_data;

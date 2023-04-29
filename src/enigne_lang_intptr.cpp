@@ -569,6 +569,48 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         _temp_str = std::to_string(static_cast<std::int64_t>(enignelang_syntax::return_num(_temp_str)));
 
         return std::to_string(enignelang_syntax::return_num(_temp_str));
+    } else if(expr->node_type == enignelang_syntax::TypeOf) {
+        this->callback_method(expr->node_type, expr);
+
+        if(expr->other.empty()) {
+            return false_str; 
+        }
+
+        const std::string _result = this->handle_expr(expr->other[0]);
+
+        switch(expr->other[0]->node_type) {
+            case enignelang_syntax::Constant: {
+                if(!expr->other[0]->node_current.empty() 
+                    && (expr->other[0]->node_current.front() == '"' 
+                        || expr->other[0]->node_current.front() == '\'')) {
+                    return true_str; 
+                }
+                
+                return std::to_string(static_cast<long double>(2));
+            }
+
+            case enignelang_syntax::LeftBPr: {
+                return std::to_string(static_cast<long double>(3));
+            }
+
+            default: {
+                if(!_result.empty()) {
+                    switch(_result.front()) {
+                        case '[':
+                            return std::to_string(static_cast<long double>(3));
+
+                        case '"':
+                        case '\'':
+                            return true_str;
+
+                        default:
+                            return std::to_string(static_cast<long double>(2));              
+                    }
+                }
+            }
+        }
+
+        return false_str;
     }
 
     return "";
@@ -1308,7 +1350,8 @@ void enignelang_intptr::walk(enignelang_ast* node,
         }
 
         case enignelang_syntax::ToString:
-        case enignelang_syntax::ToInt: {
+        case enignelang_syntax::ToInt:
+        case enignelang_syntax::TypeOf: {
             // nothing to do, out of scope. makes no sense
             // TODO: support '-warnings' arg for pushing warning
             // per unused variants, 'makes no sense' function calls etc.
