@@ -795,7 +795,7 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                             enignelang_ast* value = new enignelang_ast(this->current[this->index].token,
                                                           "constant",
                                                           enignelang_syntax::Constant);
-                            value->node_current = std::to_string(count);
+                            value->node_current = std::to_string(static_cast<long double>(count));
                                                                                   
                             node->row = token.row;
                             node->column = token.column;
