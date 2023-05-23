@@ -153,10 +153,10 @@ f :split_by_chars =
 
  ~__split_result = __split_result + __split_keyword;
 
- delete "__split_keyword";
- delete "__var_index";
- delete "__lock_data";
- delete "__split_by";
+ delete ["__split_keyword",
+         "__var_index",
+         "__lock_data",
+         "__split_by"];
 
  return __split_result;
 ;
@@ -164,10 +164,10 @@ f :split_by_chars =
 print(:split_by_chars("Hello dear splitter guy", ["a", "e"]), "\n");
 
 f :split =
- delete "__var_index";
- delete "__split_keyword";
- delete "__split_result";
- delete "__lock_data";
+ delete ["__var_index",
+         "__split_keyword",
+         "__split_result",
+         "__lock_data"];
 
  global __var_index = 1;
  global __split_keyword = "";

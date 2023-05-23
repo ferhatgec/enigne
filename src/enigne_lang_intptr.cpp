@@ -1262,7 +1262,6 @@ void enignelang_intptr::walk(enignelang_ast* node,
                         }
                     }
                 } else if(!node->statement_list.empty()) {
-                    // TODO: implement else if
                     for(auto& else_elif_node: node->statement_list) {
                         if(else_elif_node->node_type == enignelang_syntax::Elif) {
                             if(else_elif_node->node_current == "equal_to") {
@@ -1383,16 +1382,36 @@ void enignelang_intptr::walk(enignelang_ast* node,
         case enignelang_syntax::Delete: {
             this->callback_method(node->node_type, node);
 
-            const std::string _name = this->remove_hints(node->name);
+            if(node->other.empty())
+                break;
 
-            for(std::size_t i = 0; i < this->global_variants.size(); ++i) {
-                if(this->global_variants[i]->name == _name) {
-                    // we don't care order of which variant is before because it's global variant.
-                    // but there can be a lower complexity for accessing the elements by keeping their
-                    // global variant index in node, so it's TODO.
-                    std::swap(this->global_variants[i], this->global_variants.back());
-                    this->global_variants.pop_back();
-                    break;
+            if(node->other.back()->node_type == enignelang_syntax::LeftBPr) {
+                for(auto& val: node->other.back()->other) {
+                    if(val->node_type != enignelang_syntax::Constant)
+                        continue;
+
+                    for(std::size_t i = 0; i < this->global_variants.size(); ++i) {
+                        if(this->global_variants[i]->name == this->remove_hints(val->node_current)) {
+                            // we don't care order of which variant is before because it's global variant.
+                            // but there can be a lower complexity for accessing the elements by keeping their
+                            // global variant index in node, so it's TODO. (i am lazy to do this)
+                            std::swap(this->global_variants[i], this->global_variants.back());
+                            this->global_variants.pop_back();
+
+                            break;
+                        }
+                    }
+                }
+            } else if(node->other.back()->node_type == enignelang_syntax::Constant) {
+                const std::string __val = this->remove_hints(node->other.back()->node_current);
+
+                for(std::size_t i = 0; i < this->global_variants.size(); ++i) {
+                    if(this->global_variants[i]->name == __val) {
+                        std::swap(this->global_variants[i], this->global_variants.back());
+                        this->global_variants.pop_back();
+
+                        break;
+                    }
                 }
             }
 

@@ -865,27 +865,31 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             }
 
             // delete "variant";
+            // delete ["variant1", "variant2"];
             case enignelang_syntax::Delete: {
                 if(this->check_index()){ 
                     if(auto val = this->current[++this->index];
-                        val.token_type == enignelang_syntax::Constant) {
-                        if(this->current[++this->index].token_type != enignelang_syntax::Sem) {
-                            std::cout << "expected semicolon after delete \"variant\" but got " 
-                                + this->current[this->index].token << '\n';
-                            std::exit(1);
-                        }
-
+                        val.token_type != enignelang_syntax::Sem) {
                         enignelang_ast* node = new enignelang_ast(
-                            val.token,
+                            "delete",
                             "delete_variant",
                             enignelang_syntax::Delete
                         );
+
+                        arg_handle.clear();
+
+                        --this->index;
+                        node->other.push_back(this->handle_single_argument(arg_handle, node));
+
+                        arg_handle.clear();
 
                         __node__->other.push_back(std::forward<enignelang_ast*>(
                                 node
                         ));
                     } else {
-                        std::cout << "expected string literal like this: delete \"variant\";\n";
+                        std::cout << "expected semicolon after delete \"variant\" but got "
+                            + this->current[this->index].token << '\n';
+
                         std::exit(1);
                     }
                 } else {
@@ -975,14 +979,18 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             }
 
             case enignelang_syntax::Sem: {
+                if(__node__->node_type == enignelang_syntax::Delete)
+                    return;
+
                 if(__node__->node_type == enignelang_syntax::If 
                     || __node__->node_type == enignelang_syntax::Else
                     || __node__->node_type == enignelang_syntax::Elif
                     || __node__->node_type == enignelang_syntax::LoopIf) {
                     return;
-                } if(__node__->node_type == enignelang_syntax::Function) {
-                    return;
                 }
+
+                if(__node__->node_type == enignelang_syntax::Function)
+                    return;
 
                 break;
             }
