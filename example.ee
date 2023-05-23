@@ -17,7 +17,7 @@ print(to_int(50), " ",
       "\n");
 
 
-enum = 
+enum =
   Undefined,
   String,
   Decimal,
@@ -37,7 +37,7 @@ f :type_of_to_string =
 
  return "";
 ;
-    
+
 print(type_of(50), " ",
       type_of("50"), " ",
       type_of(["50"]), " ",
@@ -109,8 +109,66 @@ if argc equal_to 1 =
  ;
 ;
 
+f :split_by_chars =
+ global __var_index = 1;
+ global __split_keyword = "";
+ global __split_result = [];
+ global __lock_data = $0;
+ global __split_by = $1;
+
+ if type_of(__split_by) equal_to Array =
+  loopif __var_index not_equal_to len(__lock_data) + 1 =
+   if (__lock_data.(__var_index) is_in __split_by) equal_to true =
+    ~__split_result = __split_result + __split_keyword;
+    ~__split_keyword = "";
+   ; else =
+    ~__split_keyword = __split_keyword + __lock_data.(__var_index);
+   ;
+
+   ~__var_index = __var_index + 1;
+  ;
+ ; elif type_of(__split_by) equal_to String =
+  loopif __var_index not_equal_to len(__lock_data) + 1 =
+   if __lock_data.(__var_index) equal_to __split_by =
+    ~__split_result = __split_result + __split_keyword;
+    ~__split_keyword = "";
+   ; else =
+    ~__split_keyword = __split_keyword + __lock_data.(__var_index);
+   ;
+
+   ~__var_index = __var_index + 1;
+  ;
+ ; else =
+  loopif __var_index not_equal_to len(__lock_data) + 1 =
+   if __lock_data.(__var_index) equal_to " " =
+    ~__split_result = __split_result + __split_keyword;
+    ~__split_keyword = "";
+   ; else =
+    ~__split_keyword = __split_keyword + __lock_data.(__var_index);
+   ;
+
+   ~__var_index = __var_index + 1;
+  ;
+ ;
+
+ ~__split_result = __split_result + __split_keyword;
+
+ delete "__split_keyword";
+ delete "__var_index";
+ delete "__lock_data";
+ delete "__split_by";
+
+ return __split_result;
+;
+
+print(:split_by_chars("Hello dear splitter guy", ["a", "e"]), "\n");
 
 f :split =
+ delete "__var_index";
+ delete "__split_keyword";
+ delete "__split_result";
+ delete "__lock_data";
+
  global __var_index = 1;
  global __split_keyword = "";
  global __split_result = [];

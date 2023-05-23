@@ -199,18 +199,40 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         } else if(expr->node_current == "and") {
             return ((left_val == true_str) && (right_val == true_str)) ? true_str : false_str;
         } else if(expr->node_current == "is_in") {
+            if(left_val == right_val) {
+                return true_str;
+            }
+
+            const std::string left_val_hints = this->remove_hints(left_val);
+
+
             if(expr->node_r->node_type == enignelang_syntax::LeftBPr) {
                 for(auto& val: expr->node_r->other) {
-                    if((left_val == this->handle_expr(val))
+                    if((left_val_hints == this->remove_hints(this->handle_expr(val)))
                         || (expr->node_l == val)) {
                         return true_str;
                     }
                 }
+            } else if(expr->node_r->node_type == enignelang_syntax::VariantLit) {
+                for(auto& val: this->global_variants) {
+                    if(val->name == expr->node_r->name) {
+                        if(val->other.empty())
+                            return false_str;
+
+                        if(val->other.back()->node_type == enignelang_syntax::LeftBPr) {
+                            for(auto& data: val->other.back()->other) {
+                                if((left_val_hints == this->remove_hints(this->handle_expr(data)))
+                                    || (expr->node_l == data)) {
+                                    return true_str;
+                                }
+                            }
+                        }
+
+                        return false_str;
+                    }
+                }
             }
 
-            if(left_val == right_val) {
-                return true_str;
-            }
 
             return false_str;
         }
