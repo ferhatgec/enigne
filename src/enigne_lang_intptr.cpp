@@ -1533,7 +1533,7 @@ void enignelang_intptr::start() noexcept {
         }
 
         this->walk(this->main_structure->other[index], 
-                    this->main_structure->other[::abs(((index == 0) ? 0 : index - 1))], 
+                    this->main_structure->other[::labs(((index == 0) ? 0 : index - 1))], 
                     this->main_structure->other[index]->node_type,
                     this->main_structure->other[index]->func_args);
     }

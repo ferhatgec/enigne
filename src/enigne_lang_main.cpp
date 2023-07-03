@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     main.file(main.syntax.raw_file_data);
 
     for(unsigned i = 1; i < argc; i++) {
-        main.parser.push_constant("arg_" + std::to_string(::abs(i - 1)), "\"" + 
+        main.parser.push_constant("arg_" + std::to_string(::labs(i - 1)), "\"" + 
             std::string(argv[i]) + "\"");
     }
 

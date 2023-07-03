@@ -6,6 +6,12 @@ set output   as      "{bin_path}enigne"
 set sudo     as      "sudo"
 set compiler as      "c++"
 set standard as std  "c++20"
+
+for specific "windows" [
+    set output as "enigne.exe"
+    set standard as "/std:c++20 /Zc:__cplusplus"
+]
+
 set flag/s   as link "stdc++fs"
 
 
@@ -13,16 +19,36 @@ for signal "start" [
     set pre as "src/enigne_lang"
     set mod as "src/modules/enigne_lang"
 
-    set files as "{mod}_math.cpp
-                  {mod}_chars.cpp        
-                  {mod}_system.cpp 
-                  {mod}_fs.cpp 
-                  {pre}_ast.cpp 
-                  {pre}_intptr.cpp 
-                  {pre}_parse.cpp 
-                  {pre}_syntax.cpp"
+    
+    for specific "windows" [
+        set pre as "src/enigne_lang"
+        set mod as "src/modules/enigne_lang"
 
-    set main_file as "{pre}_main.cpp"
+        set files as "/Tp{mod}_math.cpp
+                      /Tp{mod}_chars.cpp
+                      /Tp{mod}_system.cpp
+                      /Tp{mod}_fs.cpp 
+                      /Tp{pre}_ast.cpp 
+                      /Tp{pre}_intptr.cpp 
+                      /Tp{pre}_parse.cpp 
+                      /Tp{pre}_syntax.cpp"
+        
+        set main_file as "/Tp{pre}_main.cpp"
+    ]
+
+    for specific "linux" [
+        set files as "{mod}_math.cpp
+                      {mod}_chars.cpp        
+                      {mod}_system.cpp 
+                      {mod}_fs.cpp 
+                      {pre}_ast.cpp 
+                      {pre}_intptr.cpp 
+                      {pre}_parse.cpp 
+                      {pre}_syntax.cpp"
+                      
+        set main_file as "{pre}_main.cpp"
+    ]
+
     
     for argument "install_as_library" [
         for specific "linux" [
@@ -46,7 +72,14 @@ for signal "start" [
     ]
 
     for argument "install" [
-        use exec "{sudo} {compiler} {flag/s} {standard} {files} {main_file} -o {output}"
+        # don't forget to add msvc tools to your PATH environment.
+        for specific "windows" [
+           use exec "cl.exe /nologo /EHsc /D_USE_MATH_DEFINES {standard} {files} {main_file} /Fe{output}"
+        ]
+
+        for specific "linux" [
+            use exec "{sudo} {compiler} {flag/s} {standard} {files} {main_file} -o {output}"
+        ]
 
         for exists "{output}" [
             println "Installed to {output}"
