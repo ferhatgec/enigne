@@ -21,7 +21,8 @@ for signal "start" [
 
 
     for specific "windows" [
-        #
+        set files as ""
+
         set pre as "src/enigne_lang"
         set mod as "src/modules/enigne_lang"
 
@@ -38,7 +39,8 @@ for signal "start" [
     ]
 
     for specific "linux" [
-        #
+        set files as ""
+
         set files as "{mod}_math.cpp
                       {mod}_chars.cpp        
                       {mod}_system.cpp 
