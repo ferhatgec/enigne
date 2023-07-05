@@ -1161,10 +1161,11 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             }
 
             // <print_token>(<args>);
+            case enignelang_syntax::__Print:
             case enignelang_syntax::Print: {
                 enignelang_ast* node = new enignelang_ast("print",
                                                           "[built-in]function_call",
-                                                          enignelang_syntax::Print);    
+                                                          this->current[this->index].token_type);
 
                 node->row = token.row;
                 node->column = token.column;

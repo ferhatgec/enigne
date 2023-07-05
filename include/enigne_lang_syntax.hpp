@@ -43,6 +43,7 @@ public:
         Enum, // enum
         BuiltIn, // built_in
         Print, // print
+        __Print, // __print 
         Exec, // exec
         EqualTo, // equal_to
         NotEqualTo, // not_equal_to
@@ -169,6 +170,7 @@ Undefined = -1
 
             IMPL_TOKEN("built_in", this->BuiltIn),
             IMPL_TOKEN("print", this->Print),
+            IMPL_TOKEN("__print", this->__Print),
             IMPL_TOKEN("exec", this->Exec),
             IMPL_TOKEN("equal_to", this->EqualTo),
             IMPL_TOKEN("not_equal_to", this->NotEqualTo),

@@ -19,24 +19,26 @@ for signal "start" [
     set pre as "src/enigne_lang"
     set mod as "src/modules/enigne_lang"
 
-    
+
     for specific "windows" [
+        #
         set pre as "src/enigne_lang"
         set mod as "src/modules/enigne_lang"
 
         set files as "/Tp{mod}_math.cpp
                       /Tp{mod}_chars.cpp
                       /Tp{mod}_system.cpp
-                      /Tp{mod}_fs.cpp 
-                      /Tp{pre}_ast.cpp 
-                      /Tp{pre}_intptr.cpp 
-                      /Tp{pre}_parse.cpp 
+                      /Tp{mod}_fs.cpp
+                      /Tp{pre}_ast.cpp
+                      /Tp{pre}_intptr.cpp
+                      /Tp{pre}_parse.cpp
                       /Tp{pre}_syntax.cpp"
-        
+
         set main_file as "/Tp{pre}_main.cpp"
     ]
 
     for specific "linux" [
+        #
         set files as "{mod}_math.cpp
                       {mod}_chars.cpp        
                       {mod}_system.cpp 

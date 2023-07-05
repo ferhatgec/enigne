@@ -839,6 +839,7 @@ void enignelang_intptr::walk(enignelang_ast* node,
     if(node == nullptr) return;
 
     switch(node->node_type) {
+        case enignelang_syntax::__Print:
         case enignelang_syntax::Print: {
             this->callback_method(node->node_type, node);
             
@@ -850,7 +851,11 @@ void enignelang_intptr::walk(enignelang_ast* node,
                     case enignelang_syntax::Constant:
                     case enignelang_syntax::BinComp:
                     case enignelang_syntax::BinOp: {
-                        std::cout << this->remove_hints(this->handle_expr(data));
+                        if(node->node_type == enignelang_syntax::Print)
+                            std::cout << this->remove_hints(this->handle_expr(data));
+                        else
+                            std::cout << this->handle_expr(data);
+
                         break;
                     }
 
@@ -877,11 +882,17 @@ void enignelang_intptr::walk(enignelang_ast* node,
                             if(val->name == data->name) {                                
                                 if(!val->other.empty()) {
                                     if(auto& __val__ = val->other[0]; __val__->node_type == enignelang_syntax::Constant) {
-                                        std::cout << this->remove_hints(__val__->node_current);
+                                        if(node->node_type == enignelang_syntax::Print)
+                                            std::cout << this->remove_hints(__val__->node_current);
+                                        else
+                                            std::cout << __val__->node_current;
                                     } else if(__val__->node_type == enignelang_syntax::LeftBPr) {
                                         this->expand(__val__);    
                                     } else {
-                                        std::cout << this->remove_hints(this->handle_expr(__val__));
+                                        if(node->node_type == enignelang_syntax::Print)
+                                            std::cout << this->remove_hints(this->handle_expr(__val__));
+                                        else
+                                            std::cout << this->handle_expr(__val__);
                                     }
                                 }
                                 break;
@@ -946,9 +957,13 @@ void enignelang_intptr::walk(enignelang_ast* node,
                                 for(auto block: val->other) {
                                     if(block == nullptr) continue;
                                     if(block->node_type == enignelang_syntax::Return) {
-                                        if(!block->other.empty())
-                                            std::cout << this->remove_hints(this->handle_expr(block->other[0]));
-                                        
+                                        if(!block->other.empty()) {
+                                            if(node->node_type == enignelang_syntax::Print)
+                                                std::cout << this->remove_hints(this->handle_expr(block->other[0]));
+                                            else
+                                                std::cout << this->handle_expr(block->other[0]);
+                                        }
+
                                         break;
                                     } else if(block->node_type == enignelang_syntax::If) {
                                         if(!this->jump->other.empty()) {
@@ -963,7 +978,11 @@ void enignelang_intptr::walk(enignelang_ast* node,
                                     walk(block, data, block->node_type, {});
 
                                     if(last != nullptr && last->name == "_return_control_ok_") {
-                                        std::cout << this->remove_hints(last->node_current);
+                                        if(node->node_type == enignelang_syntax::Print)
+                                            std::cout << this->remove_hints(last->node_current);
+                                        else
+                                            std::cout << last->node_current;
+
                                         break;
                                     }
                                 }
@@ -977,8 +996,13 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
 
                     default: {
-                        if(!data->other.empty() || data->node_type >= enignelang_syntax::PathExists)
-                            std::cout << this->remove_hints(this->handle_expr(data));
+                        if(!data->other.empty() || data->node_type >= enignelang_syntax::PathExists) {
+                            if(node->node_type == enignelang_syntax::Print)
+                                std::cout << this->remove_hints(this->handle_expr(data));
+                            else
+                                std::cout << this->handle_expr(data);
+                        }
+
                         break;
                     }
                 }
