@@ -53,15 +53,15 @@ constexpr std::uint8_t recursion_limit = 255;
     || defined(_M_X64)
     constexpr std::string_view cpu_arch { SERIALIZE("x86_64") };
 #elif defined(i386) \
-    || defined(__i386__) \ 
+    || defined(__i386__) \
     || defined(__i386) \
     || defined(_M_IX86)
     constexpr std::string_view cpu_arch { SERIALIZE("x86_32") };
-#elif defined(__aarch64__) \ 
+#elif defined(__aarch64__) \
     || defined(_M_ARM64)
     constexpr std::string_view cpu_arch { SERIALIZE("arm64") };
 #elif defined(mips) \
-    || defined(__mips__) \ 
+    || defined(__mips__) \
     || defined(__mips)
     constexpr std::string_view cpu_arch { SERIALIZE("mips") };
 #elif defined(__sparc__) \
