@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #define IMPL_TOKEN(str, equivalent) {str, equivalent}
 
@@ -116,6 +116,8 @@ public:
         ToString, // to_string
         ToInt, // to_int
         TypeOf, // type_of
+        Platform, // platform
+        Architecture, // arch
 Undefined = -1
     };
 
@@ -128,8 +130,7 @@ Undefined = -1
     public:
     };
 
-
-    const std::map<std::string, enignelang_tokens> tokens = {
+    const std::unordered_map<std::string, enignelang_tokens> tokens {
             IMPL_TOKEN("global", this->Variant),
             IMPL_TOKEN("variant", this->Variant),
 
@@ -253,7 +254,9 @@ Undefined = -1
 
             IMPL_TOKEN("to_string", this->ToString),
             IMPL_TOKEN("to_int", this->ToInt),
-            IMPL_TOKEN("type_of", this->TypeOf)
+            IMPL_TOKEN("type_of", this->TypeOf),
+            IMPL_TOKEN("platform", this->Platform),
+            IMPL_TOKEN("arch", this->Architecture)
     };
 
     std::string raw_file_data;

@@ -11,8 +11,65 @@
 #include <stack>
 #include <iostream>
 #include <functional>
+#include <string_view>
 
 constexpr std::uint8_t recursion_limit = 255;
+
+#define SERIALIZE(str) "\"" str "\""
+
+#if defined(_WIN16) \
+    || defined(_WIN32) \
+    || defined(_WIN64) \
+    || defined(__WIN32__) \
+    || defined(__TOS_WIN__) \
+    || defined(__WINDOWS__)
+    constexpr std::string_view os_platform { SERIALIZE("windows") };
+#elif defined(macintosh) \
+    || defined(Macintosh) \
+    || (defined(__APPLE__) && defined(__MACH__))
+    constexpr std::string_view os_platform { SERIALIZE("macos") };
+#elif defined(__linux__) \
+    || defined(linux) \
+    || defined(__linux) \
+    || defined(__gnu_linux__)
+    constexpr std::string_view os_platform { SERIALIZE("linux") };
+#elif defined(__ANDROID__)
+    constexpr std::string_view os_platform { SERIALIZE("android") };
+#elif (defined(__FreeBSD_kernel__) && defined(__GLIBC__)) \
+    || defined(__FreeBSD__) \
+    || defined(__FreeBSD_kernel__)
+    constexpr std::string_view os_platform { SERIALIZE("freebsd") };
+#elif defined(__DragonFly__)
+    constexpr std::string_view os_platform { SERIALIZE("dragonfly") };
+#elif defined(__OpenBSD__)
+    constexpr std::string_view os_platform { SERIALIZE("openbsd") };
+#elif defined(__NetBSD__)
+    constexpr std::string_view os_platform { SERIALIZE("netbsd") };
+#else
+    constexpr std::string_view os_platform { SERIALIZE("") };
+#endif
+
+#if defined(__x86_64__) \
+    || defined(_M_X64)
+    constexpr std::string_view cpu_arch { SERIALIZE("x86_64") };
+#elif defined(i386) \
+    || defined(__i386__) \ 
+    || defined(__i386) \
+    || defined(_M_IX86)
+    constexpr std::string_view cpu_arch { SERIALIZE("x86_32") };
+#elif defined(__aarch64__) \ 
+    || defined(_M_ARM64)
+    constexpr std::string_view cpu_arch { SERIALIZE("arm64") };
+#elif defined(mips) \
+    || defined(__mips__) \ 
+    || defined(__mips)
+    constexpr std::string_view cpu_arch { SERIALIZE("mips") };
+#elif defined(__sparc__) \
+    || defined(__sparc)
+    constexpr std::string_view cpu_arch { SERIALIZE("sparc") };
+#else
+    constexpr std::string_view cpu_arch { SERIALIZE("") };
+#endif
 
 class enignelang_include_info {
 public:

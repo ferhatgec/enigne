@@ -19,6 +19,10 @@ print(to_int(50), " ",
       "\n");
 
 
+print("current platform: ", platform(), 
+      "\n",
+      "current cpu architecture: ", arch(), "\n");
+
 enum =
   Undefined,
   String,
@@ -219,9 +223,11 @@ print(to_lower("ENIGNE"), " ",
       ends_with("enigne"), " ",
       starts_with("enigne") equal_to ends_with("enigne"), "\n");
 
-print("type something: ", :input());
+if platform() not_equal_to "windows" =
+ print("type something: ", :input());
 
-print("press any key to continue", char_input(), "\n");
+ print("press any key to continue", char_input(), "\n");
+;
 
 exit();
 

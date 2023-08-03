@@ -633,6 +633,11 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         }
 
         return false_str;
+    } else if(expr->node_type == enignelang_syntax::Platform) {
+        return std::string(os_platform); // ez copy vvv
+    } else if(expr->node_type == enignelang_syntax::Architecture) {
+        return std::string(cpu_arch); // ez copy, TODO: use std::string_view for handle_expr() -used for runtime evaluation-, 
+                                      // handle_expr() just returns fixed length std::string
     }
 
     return "";
@@ -1396,7 +1401,9 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
         case enignelang_syntax::ToString:
         case enignelang_syntax::ToInt:
-        case enignelang_syntax::TypeOf: {
+        case enignelang_syntax::TypeOf:
+        case enignelang_syntax::Platform:
+        case enignelang_syntax::Architecture: {
             // nothing to do, out of scope. makes no sense
             // TODO: support '-warnings' arg for pushing warning
             // per unused variants, 'makes no sense' function calls etc.
@@ -1491,12 +1498,15 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
 void enignelang_intptr::include_external_script(enignelang_ast* node) noexcept {
     if(node == nullptr || node->name.empty()) return;
-
+ 
     std::ifstream read_stream(
         ((node->node_id == "include_script_src") ? std::filesystem::current_path().string() : "") 
-        + "/" + this->remove_hints(node->name));
+        + (os_platform == SERIALIZE("windows") ? "\\" : "/") + this->remove_hints(node->name));
 
-    if(!read_stream) return;
+    if(!read_stream) {
+        std::cout << "cannot include " << node->name << '\n';
+        return;
+    }
 
     enignelang __main;
     
@@ -1514,24 +1524,26 @@ void enignelang_intptr::include_external_script(enignelang_ast* node) noexcept {
     for(auto& val: __main.parser.ast_main->other) {
         if(val->node_type == enignelang_syntax::Variant 
             || val->node_type == enignelang_syntax::Function
-            || val->node_type == enignelang_syntax::Tilde) {
+            || val->node_type == enignelang_syntax::Tilde 
+            && val != nullptr) {
             list.push_back(std::forward<enignelang_ast*>(val));
         }
     }
 
     enignelang_include_info info;
 
-    info.info = list;
+    info.info = std::move(list);
     info.name = node->name;
 
-    include_infos.push_back(info);
+    this->include_infos.push_back(info);
 
     //__data.parser = __main.parser;
 }
 
 void enignelang_intptr::start() noexcept {
     for(std::size_t n = 0; n < this->main_structure->other.size(); ++n) {
-        if(this->main_structure->other[n]->node_type == enignelang_syntax::Include) {
+        if(this->main_structure->other[n] != nullptr 
+            && this->main_structure->other[n]->node_type == enignelang_syntax::Include) {
             this->include_external_script(this->main_structure->other[n]);
         }
     }
