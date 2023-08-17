@@ -39,6 +39,11 @@ public:
         IsIn, // is_in
         And, // and
         Or, // or
+        BitwiseAnd, // band
+        BitwiseOr, // bor
+        BitwiseXor, // bxor
+        BitwiseLeftShift, // bls
+        BitwiseRightShift, // brs
 
         Enum, // enum
         BuiltIn, // built_in
@@ -166,6 +171,11 @@ Undefined = -1
             IMPL_TOKEN("is_in", this->IsIn),
             IMPL_TOKEN("and", this->And),
             IMPL_TOKEN("or", this->Or),
+            IMPL_TOKEN("band", this->BitwiseAnd),
+            IMPL_TOKEN("bor", this->BitwiseOr),
+            IMPL_TOKEN("bxor", this->BitwiseXor),
+            IMPL_TOKEN("bls", this->BitwiseLeftShift),
+            IMPL_TOKEN("brs", this->BitwiseRightShift),
 
             IMPL_TOKEN("enum", this->Enum),
 

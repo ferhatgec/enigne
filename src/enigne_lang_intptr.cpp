@@ -198,6 +198,21 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
             return ((left_val == true_str) || (right_val == true_str)) ? true_str : false_str;
         } else if(expr->node_current == "and") {
             return ((left_val == true_str) && (right_val == true_str)) ? true_str : false_str;
+        } else if(expr->node_current == "band") {
+            return std::to_string(static_cast<long long>(enignelang_syntax::return_num(left_val)) 
+                                        & static_cast<long long>(enignelang_syntax::return_num(right_val)));
+        } else if(expr->node_current == "bor") {
+            return std::to_string(static_cast<long long>(enignelang_syntax::return_num(left_val)) 
+                                        | static_cast<long long>(enignelang_syntax::return_num(right_val)));
+        } else if(expr->node_current == "bxor") {
+            return std::to_string(static_cast<long long>(enignelang_syntax::return_num(left_val)) 
+                                        ^ static_cast<long long>(enignelang_syntax::return_num(right_val)));
+        } else if(expr->node_current == "bls") {
+            return std::to_string(static_cast<long long>(enignelang_syntax::return_num(left_val)) 
+                                        << static_cast<long long>(enignelang_syntax::return_num(right_val)));
+        } else if(expr->node_current == "brs") {
+            return std::to_string(static_cast<long long>(enignelang_syntax::return_num(left_val)) 
+                                        >> static_cast<long long>(enignelang_syntax::return_num(right_val)));
         } else if(expr->node_current == "is_in") {
             if(left_val == right_val) {
                 return true_str;

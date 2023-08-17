@@ -1,6 +1,6 @@
-include $"header.ee"
+# include $"header.ee"
 
-print(file_name, " ", :boolstr(false), " ", :boolstr(true), "\n");
+# print(file_name, " ", :boolstr(false), " ", :boolstr(true), "\n");
 
 global primes = [2, 3, 5, 7, 11, 13, 17, 19];
 global gech = "gech";
@@ -18,6 +18,12 @@ print(to_int(50), " ",
       to_int("50"),
       "\n");
 
+global test_data = to_string((1 bls 10)); # 2 ^ 10
+
+__print(test_data, "\n");
+print(test_data, "\n");
+
+print((5 bls 9), " ", (2 brs 5), (2 bxor 3), "\n");
 
 print("current platform: ", platform(), 
       "\n",
