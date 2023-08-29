@@ -123,6 +123,8 @@ public:
     void include_external_script(enignelang_ast* node) noexcept;
     void expand(enignelang_ast* node) noexcept;
     
+    void general_function_call(enignelang_ast* node, enignelang_ast* val_node) noexcept;
+
     std::string add(const std::string& left, const std::string& right) noexcept;
     std::string sub(const std::string& left, const std::string& right) noexcept;
     std::string div(const std::string& left, const std::string& right) noexcept;

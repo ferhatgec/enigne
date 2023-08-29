@@ -295,30 +295,7 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
                 }
             } else if(Val->node_type == enignelang_syntax::FunctionCall) {
                 auto callback = [this, Val](enignelang_ast* node) {
-                    if(this->parser.is_fn(node->name)) {
-                        for(auto val : this->main_structure->other) {
-                            if(val->node_type == enignelang_syntax::Function &&
-                                val->name == node->name) {
-                                this->jump = new enignelang_ast();
-                                this->jump->other.assign(Val->other.begin(), Val->other.end());
-                                
-                                for(auto block: val->other) {
-                                    if(block->node_type == enignelang_syntax::Return) {        
-                                        Val->node_type = enignelang_syntax::Constant;
-
-                                        if(block->other.empty())
-                                            Val->node_current = "";
-                                        else
-                                            Val->node_current = this->handle_expr(block->other[0]);
-                                        
-                                        break;
-                                    }
-
-                                    this->walk(block, val, block->node_type, {});
-                                } break;
-                            }
-                        }
-                    }
+                    this->general_function_call(node, Val);
 
                     // for(auto& cb: Val->other)
                     //  ...
@@ -333,13 +310,23 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
                 this->jump->other.assign(expr->other.begin(), expr->other.end());
                 boolean _return_control_ = false;
                 enignelang_ast* last = nullptr;
+                std::size_t _defer_index = -1, _current_index = -1;
 
                 for(auto block: val->other) {
+                    ++_current_index;
+
                     if(block == nullptr) continue;
                     if(block->node_type == enignelang_syntax::Return) {
-                        if(!block->other.empty())
-                            return this->handle_expr(block->other[0]);
-                                        
+                        if(!block->other.empty()) {
+                            auto return_value = this->handle_expr(block->other[0]);
+
+                            if(_defer_index >= 0 && val->other.size() > _defer_index)
+                                for(auto& _block_: val->other[_defer_index]->other)
+                                    this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
+
+                            return return_value;
+                        }
+
                         break;
                     } else if(block->node_type == enignelang_syntax::If) {
                         if(!this->jump->other.empty()) {                   
@@ -349,14 +336,27 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
                             last = add;
                             this->jump->other.push_back(std::forward<enignelang_ast*>(add));
                         }
+                    } else if(block->node_type == enignelang_syntax::Defer) {
+                        _defer_index = _current_index;
+                        continue;
                     }
 
                     walk(block, expr, block->node_type, {});
 
                     if(last != nullptr && last->name == "_return_control_ok_") {
+                        if(_defer_index >= 0 && val->other.size() > _defer_index)
+                            for(auto& _block_: val->other[_defer_index]->other)
+                                this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
+                        
                         return last->node_current;
                     }
-                } break;
+                } 
+
+                if(_defer_index >= 0 && val->other.size() > _defer_index)
+                    for(auto& _block_: val->other[_defer_index]->other)
+                        this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
+                
+                break;
             }
         }
     } else if(expr->node_type == enignelang_syntax::LeftBPr) {
@@ -715,6 +715,45 @@ enignelang_ast* enignelang_intptr::copy_array_elements(enignelang_ast* node) noe
     return node;
 }
 
+void enignelang_intptr::general_function_call(enignelang_ast* node, enignelang_ast* val_node) noexcept {
+    if(this->parser.is_fn(node->name)) {
+        for(auto val : this->main_structure->other) {
+            if(val->node_type == enignelang_syntax::Function && 
+                    val->name == node->name) {
+                std::size_t _defer_index = -1, _current_index = -1;
+                this->jump = new enignelang_ast();
+                this->jump->other.assign(val_node->other.begin(), val_node->other.end());
+                                
+                for(auto block: val->other) {
+                    ++_current_index;
+
+                    if(block->node_type == enignelang_syntax::Return) {        
+                        val_node->node_type = enignelang_syntax::Constant;
+
+                        if(block->other.empty())
+                            val_node->node_current = "";
+                        else
+                            val_node->node_current = this->handle_expr(block->other[0]);
+                    
+                        break;
+                    } else if(block->node_type == enignelang_syntax::Defer) {
+                        _defer_index = _current_index;
+                        continue;
+                    }
+                    
+                    this->walk(block, val, block->node_type, {});
+                }
+                
+                if(_defer_index >= 0 && val->other.size() > _defer_index)
+                    for(auto& _block_: val->other[_defer_index]->other)
+                        this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
+
+                break;
+            }            
+        }
+    }
+}
+
 std::string enignelang_intptr::add(const std::string &left, const std::string &right) noexcept {
     if(left.empty()) return right;
     if(right.empty()) return left;
@@ -933,30 +972,7 @@ void enignelang_intptr::walk(enignelang_ast* node,
                                 }
                             } else if(Val->node_type == enignelang_syntax::FunctionCall) {
                                 auto callback = [this, Val](enignelang_ast* node) {
-                                    if(this->parser.is_fn(node->name)) {
-                                        for(auto val : this->main_structure->other) {
-                                            if(val->node_type == enignelang_syntax::Function &&
-                                                val->name == node->name) {
-                                                this->jump = new enignelang_ast();
-                                                this->jump->other.assign(Val->other.begin(), Val->other.end());
-                                
-                                                for(auto block: val->other) {
-                                                    if(block->node_type == enignelang_syntax::Return) {        
-                                                        Val->node_type = enignelang_syntax::Constant;
-
-                                                        if(block->other.empty())
-                                                            Val->node_current = "";
-                                                        else
-                                                            Val->node_current = this->handle_expr(block->other[0]);
-                                                        break;
-                                                    }
-
-                                                    this->walk(block, val, block->node_type, {});
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
+                                    this->general_function_call(node, Val);
 
                                     //for(auto& cb: Val->other)
                                     // ...
@@ -971,17 +987,29 @@ void enignelang_intptr::walk(enignelang_ast* node,
                             if(val->node_type == enignelang_syntax::Function && val->name == data->name) {
                                 this->jump = new enignelang_ast();
                                 this->jump->other.assign(data->other.begin(), data->other.end());
+                                std::size_t _defer_index = -1, _current_index = -1;
                                 boolean _return_control_ = false;
                                 enignelang_ast* last = nullptr;
 
                                 for(auto block: val->other) {
+                                    ++_current_index;
                                     if(block == nullptr) continue;
                                     if(block->node_type == enignelang_syntax::Return) {
                                         if(!block->other.empty()) {
+                                            std::string return_value;
+
                                             if(node->node_type == enignelang_syntax::Print)
-                                                std::cout << this->remove_hints(this->handle_expr(block->other[0]));
+                                                return_value = this->remove_hints(this->handle_expr(block->other[0]));
                                             else
-                                                std::cout << this->handle_expr(block->other[0]);
+                                                return_value = this->handle_expr(block->other[0]);
+
+                                            if(_defer_index >= 0 && val->other.size() > _defer_index)
+                                                for(auto& _block_: val->other[_defer_index]->other)
+                                                    this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
+
+                                            std::cout << return_value;
+
+                                            _defer_index = -1;
                                         }
 
                                         break;
@@ -993,19 +1021,36 @@ void enignelang_intptr::walk(enignelang_ast* node,
                                             last = add;
                                             this->jump->other.push_back(std::forward<enignelang_ast*>(add));
                                         }
+                                    } else if(block->node_type == enignelang_syntax::Defer) {
+                                       _defer_index = _current_index;
+                                       continue;
                                     }
 
                                     walk(block, data, block->node_type, {});
 
                                     if(last != nullptr && last->name == "_return_control_ok_") {
+                                        std::string return_value;
+
                                         if(node->node_type == enignelang_syntax::Print)
-                                            std::cout << this->remove_hints(last->node_current);
+                                            return_value = this->remove_hints(last->node_current);
                                         else
-                                            std::cout << last->node_current;
+                                            return_value = last->node_current;
+
+                                        if(_defer_index >= 0 && val->other.size() > _defer_index)
+                                            for(auto& _block_: val->other[_defer_index]->other)
+                                                this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
+                                        
+                                        _defer_index = -1;
+
+                                        std::cout << return_value;
 
                                         break;
                                     }
                                 }
+
+                                if(_defer_index >= 0 && val->other.size() > _defer_index)
+                                    for(auto& _block_: val->other[_defer_index]->other)
+                                       this->walk(_block_, val->other[_defer_index], _block_->node_type, {});
 
                                 break;
                             }
@@ -1055,27 +1100,7 @@ void enignelang_intptr::walk(enignelang_ast* node,
                     }
                 } else if(Val->node_type == enignelang_syntax::FunctionCall) {
                     auto callback = [this, Val](enignelang_ast* node) {
-                        if(this->parser.is_fn(node->name)) {
-                            for(auto val : this->main_structure->other) {
-                                if(val->node_type == enignelang_syntax::Function &&
-                                    val->name == node->name) {
-                                    this->jump = new enignelang_ast();
-                                    this->jump->other.assign(Val->other.begin(), Val->other.end());
-                                    
-                                    for(auto block: val->other) {
-                                        if(block->node_type == enignelang_syntax::Return) {        
-                                            Val->node_type = enignelang_syntax::Constant;
-                                            
-                                            if(block->other.empty())
-                                                Val->node_current = "";
-                                            else
-                                                Val->node_current = this->handle_expr(block->other[0]);
-                                            break;
-                                        } this->walk(block, val, block->node_type, {});
-                                    } break;
-                                }
-                            }
-                        }
+                        this->general_function_call(node, Val);
 
                         //for(auto& cb: Val->other)
                         // ...
@@ -1088,13 +1113,25 @@ void enignelang_intptr::walk(enignelang_ast* node,
                 if(auto fn = this->main_structure->other[node->index_of_fn];
                     fn != nullptr &&
                     fn->node_type == enignelang_syntax::Function && (fn->name == node->name)) {
-                    
+                    std::size_t _defer_index = -1, _current_index = -1;
                     this->jump = new enignelang_ast();
                     this->jump->other.assign(node->other.begin(), node->other.end());
                     
                     for(auto& block: fn->other) {
+                        ++_current_index;
                         if(block == nullptr) continue;
-                        if(block->node_type == enignelang_syntax::Return) { return; }
+                        if(block->node_type == enignelang_syntax::Return) { 
+                            if(_defer_index >= 0 && fn->other.size() > _defer_index)
+                                for(auto& _block_: fn->other[_defer_index]->other)
+                                    this->walk(_block_, fn->other[_defer_index], _block_->node_type, {});
+
+                            return; 
+                        }
+                        if(block->node_type == enignelang_syntax::Defer) {
+                            _defer_index = _current_index;
+                            continue;
+                        }
+
                         if(block->node_type == enignelang_syntax::FunctionCall && block->name == node->name) {
                             if(++this->recursion_fn_call == 255) {
                                 std::cout << "note: recursion limit exceed\n";
@@ -1102,9 +1139,13 @@ void enignelang_intptr::walk(enignelang_ast* node,
                                 return;
                             }
                         }
-
+                        
                         walk(block, node, block->node_type, node->func_args);
                     }
+
+                    if(_defer_index >= 0 && fn->other.size() > _defer_index)
+                        for(auto& _block_: fn->other[_defer_index]->other)
+                            this->walk(_block_, fn->other[_defer_index], _block_->node_type, {});
                 }
             }
             break;

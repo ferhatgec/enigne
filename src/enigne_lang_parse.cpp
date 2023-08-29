@@ -871,6 +871,27 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                 break;
             }
 
+            // defer = 
+            //  ...
+            // ;
+            case enignelang_syntax::Defer: {
+                if(this->current[++this->index].token_type == enignelang_syntax::Eq) {
+                    enignelang_ast* node = new enignelang_ast("defer", "defer_decl", enignelang_syntax::Defer);
+                    
+                    node->row = token.row;
+                    node->column = token.column;
+                    
+                    arg_handle.clear();
+                    
+                    ++this->index;
+                    
+                    __node__->other.push_back(std::forward<enignelang_ast*>(node));
+                    this->handle_start(__node__->other.back());
+                }
+
+                break;
+            }
+
             // delete "variant";
             // delete ["variant1", "variant2"];
             case enignelang_syntax::Delete: {
@@ -996,7 +1017,8 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                     return;
                 }
 
-                if(__node__->node_type == enignelang_syntax::Function)
+                if(__node__->node_type == enignelang_syntax::Function ||
+                    __node__->node_type == enignelang_syntax::Defer)
                     return;
 
                 break;

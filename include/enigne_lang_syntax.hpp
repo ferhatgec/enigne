@@ -60,6 +60,7 @@ public:
 
         Include, // include
 
+        Defer, // defer
         Delete, // delete
 
         Iterator, // ->
@@ -194,6 +195,7 @@ Undefined = -1
 
             IMPL_TOKEN("include", this->Include),
 
+            IMPL_TOKEN("defer", this->Defer),
             IMPL_TOKEN("delete", this->Delete),
 
             IMPL_TOKEN("==", this->EqualTo),

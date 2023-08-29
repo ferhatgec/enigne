@@ -6,8 +6,8 @@ global primes = [2, 3, 5, 7, 11, 13, 17, 19];
 global gech = "gech";
 
 global array = [primes.0, [primes.1]];
-global copy_element = array.1; # there's no still array.0.n; like syntax.
-
+global copy_element = array.1; # there's still no array.0.n; like syntax.
+print(copy_element);
 __print("Hello!\n");
 
 print(to_string(50), " ",
@@ -234,6 +234,23 @@ if platform() not_equal_to "windows" =
 
  print("press any key to continue", char_input(), "\n");
 ;
+
+f :generate =
+ global seed      = $0;
+ ~seed = ((6364136223846793005 * $0) + 1);
+ 
+ defer =
+  delete "seed";
+  print("result: "); # will be called after the evaluation of return, then the evaluated value will be returned.
+ ;
+
+ return (seed % (($2 - $1) + 1)) + $1;  
+;
+
+print(:generate(4, 5, 24), "\n");
+global x = :generate(4, 5, 24); # handle_expr() will be called after the first use of x
+
+print(x);
 
 exit();
 
