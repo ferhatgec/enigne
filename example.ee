@@ -250,7 +250,7 @@ f :generate =
 print(:generate(4, 5, 24), "\n");
 global x = :generate(4, 5, 24); # handle_expr() will be called after the first use of x
 
-print(x);
+print(x, "\n");
 
 exit();
 
