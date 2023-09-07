@@ -393,6 +393,7 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::SquareRoot:
             case enignelang_syntax::Pi:
             case enignelang_syntax::Euler:
+            case enignelang_syntax::Round:
             case enignelang_syntax::StartsWith:
             case enignelang_syntax::EndsWith:
             case enignelang_syntax::ToUpper:
@@ -1253,6 +1254,7 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::SquareRoot:
             case enignelang_syntax::Pi:
             case enignelang_syntax::Euler:
+            case enignelang_syntax::Round:
             case enignelang_syntax::StartsWith:
             case enignelang_syntax::EndsWith:
             case enignelang_syntax::ToUpper:

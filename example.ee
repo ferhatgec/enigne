@@ -252,6 +252,50 @@ global x = :generate(4, 5, 24); # handle_expr() will be called after the first u
 
 print(x, "\n");
 
+f :factorial =
+ global x = $0;
+ global result = 1;
+
+ loopif x not_equal_to 0 =
+  ~result = result * x;
+  ~x = x - 1;
+ ;
+
+ defer =
+  delete [
+    "x",
+    "result"
+  ];
+ ;
+
+ return result;
+;
+
+f :fibonacci =
+ if $0 less_than 2 =
+  return $0;
+ ;
+ 
+ global value = 1;
+ global n = $0;
+ 
+ loopif n not_equal_to 0 =
+  ~value = value * 1.6180339887498949025257388711906969547271728515625;
+  ~n = n - 1;
+ ;
+
+ defer =
+  delete [
+    "value",
+    "n"
+  ];
+ ;
+
+ return round(value / sqrt(5));
+;
+
+print(:factorial(6), "\n", :fibonacci(11), "\n");
+
 exit();
 
 print("hmmmm\n");

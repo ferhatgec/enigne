@@ -19,6 +19,10 @@ const std::string enignelang_math::floor(const std::string& num) noexcept {
     return std::to_string(std::floor(enignelang_syntax::return_num(num)));
 }
 
+const std::string enignelang_math::round(const std::string& num) noexcept {
+    return std::to_string(std::roundl(enignelang_syntax::return_num(num)));
+}
+
 const std::string enignelang_math::log(const std::string& num, const std::string& base) noexcept {
     return std::to_string(std::log(enignelang_syntax::return_num(num)) / std::log(enignelang_syntax::return_num(base)));
 }

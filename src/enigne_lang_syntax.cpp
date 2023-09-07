@@ -19,6 +19,8 @@ void enignelang_syntax::add_file_data(const std::string file) noexcept {
     this->raw_file_data = file;
 }
 
+
+
 void enignelang_syntax::tokenize() noexcept {
     std::string current_token;
     bool escape_sequence = false,
@@ -72,6 +74,13 @@ void enignelang_syntax::tokenize() noexcept {
                 if(data)
                     current_token.push_back(this->raw_file_data[i]);
                 else {
+                    if(this->raw_file_data[i] == '.' 
+                        && !current_token.empty() 
+                        && (std::find_if(current_token.begin(), current_token.end(), [](unsigned char ch) { return !std::isdigit(ch); }) == current_token.end())) {
+                        current_token.push_back('.');
+                        continue;
+                    }
+
                     if((this->raw_file_data[i] == '-' &&
                         this->raw_file_data[i + 1] == '>') ||
                         (this->raw_file_data[i] == '=' &&

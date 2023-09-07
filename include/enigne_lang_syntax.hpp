@@ -113,6 +113,7 @@ public:
         SquareRoot, // sqrt
         Pi, // pi
         Euler, // e
+        Round, // round
         StartsWith, // starts_with
         EndsWith, // ends_with
         ToLower, // to_lower
@@ -258,6 +259,7 @@ Undefined = -1
             IMPL_TOKEN("sqrt", this->SquareRoot),
             IMPL_TOKEN("pi", this->Pi),
             IMPL_TOKEN("e", this->Euler),
+            IMPL_TOKEN("round", this->Round),
             IMPL_TOKEN("starts_with", this->StartsWith),
             IMPL_TOKEN("ends_with", this->EndsWith),
             IMPL_TOKEN("to_lower", this->ToLower),

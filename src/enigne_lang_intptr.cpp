@@ -551,6 +551,10 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
         this->callback_method(expr->node_type, expr);
         
         return enignelang_math::e();
+    } else if(expr->node_type == enignelang_syntax::Round) {
+        this->callback_method(expr->node_type, expr);
+
+        return enignelang_math::round(this->remove_hints(this->handle_expr(expr->other[0])));
     } else if(expr->node_type == enignelang_syntax::StartsWith) {
         this->callback_method(expr->node_type, expr);
 

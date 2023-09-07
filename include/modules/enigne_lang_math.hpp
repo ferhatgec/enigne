@@ -20,6 +20,7 @@ namespace enignelang_math {
     const std::string abs(const std::string& num) noexcept;
     const std::string ceil(const std::string& num) noexcept;
     const std::string floor(const std::string& num) noexcept;
+    const std::string round(const std::string& num) noexcept;
     const std::string log(const std::string& num, 
                             const std::string& base) noexcept;
     const std::string sqrt(const std::string& num) noexcept;
