@@ -657,6 +657,15 @@ std::string enignelang_intptr::handle_expr(enignelang_ast* expr) noexcept {
     } else if(expr->node_type == enignelang_syntax::Architecture) {
         return std::string(cpu_arch); // ez copy, TODO: use std::string_view for handle_expr() -used for runtime evaluation-, 
                                       // handle_expr() just returns fixed length std::string
+    } else if(expr->node_type == enignelang_syntax::ConstEval) {
+        if(!expr->other.empty())
+            return this->handle_expr(expr->other.back());
+    } else if(expr->node_type == enignelang_syntax::Print) {
+        for(auto& val: expr->other)
+            std::cout << this->remove_hints(this->handle_expr(val));
+    } else if(expr->node_type == enignelang_syntax::__Print) {
+        for(auto& val: expr->other)
+            std::cout << this->handle_expr(val);
     }
 
     return "";
@@ -1545,6 +1554,9 @@ void enignelang_intptr::walk(enignelang_ast* node,
 
             variant->other.assign(node->other.begin(), node->other.end());
 
+            if(node->is_const_eval)
+                variant->node_current = this->handle_expr(variant->other.back());
+            
             this->global_variants.push_back(variant);
 
             break;

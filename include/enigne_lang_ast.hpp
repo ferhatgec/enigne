@@ -38,6 +38,8 @@ public:
     std::vector<std::string> expr;
     
     long long unsigned row = 1, column = 1;
+
+    bool is_const_eval = false;
 public:
     enignelang_ast() {
         this->name = "enigne_global_node_";

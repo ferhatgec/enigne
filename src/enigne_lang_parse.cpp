@@ -403,7 +403,10 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
             case enignelang_syntax::ToInt: 
             case enignelang_syntax::TypeOf:
             case enignelang_syntax::Platform:
-            case enignelang_syntax::Architecture: {
+            case enignelang_syntax::Architecture:
+            case enignelang_syntax::ConstEval:
+            case enignelang_syntax::Print:
+            case enignelang_syntax::__Print: {
                 enignelang_ast* node = new enignelang_ast(token.token,
                                                             "inline_function_call",
                                                              token.token_type);
@@ -411,6 +414,9 @@ enignelang_ast* enignelang_parse::handle_single_argument(std::vector<enignelang_
                 node->column = token.column;
 
                 ++this->index;
+
+                if(token.token_type == enignelang_syntax::ConstEval)
+                       from->is_const_eval = true;
 
                 if(this->current[this->index].token_type != enignelang_syntax::LeftPr) {
                     std::cout << "error: function(...) -> expected '('\n";
@@ -1071,7 +1077,6 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
                         std::exit(1);
                     }
                 } else if(this->current[this->index].token_type == enignelang_syntax::Elif) {
-                   
                     while(this->current[this->index].token_type == enignelang_syntax::Elif) {
                         enignelang_ast* elif_node = new enignelang_ast("elif",
                                                                     "elif_statement",
@@ -1264,12 +1269,17 @@ void enignelang_parse::handle_start(enignelang_ast* __node__) noexcept {
             case enignelang_syntax::ToInt:
             case enignelang_syntax::TypeOf:
             case enignelang_syntax::Platform:
-            case enignelang_syntax::Architecture: {
+            case enignelang_syntax::Architecture:
+            case enignelang_syntax::ConstEval: {
                 __node__->other.push_back(
                         std::forward<enignelang_ast*>(this->impl_generic_fn_call(token.token, 
                                                                                 "[built-in]function_call", 
                                                                                 token.token_type))
                         );
+                        
+                if(auto& val = __node__->other.back(); (val != nullptr) && (token.token_type == enignelang_syntax::ConstEval))
+                    __node__->is_const_eval = true;
+
                 break;
             }
         }

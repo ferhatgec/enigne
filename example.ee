@@ -294,6 +294,17 @@ f :fibonacci =
  return round(value / sqrt(5));
 ;
 
+global x = const_eval(print("Hello world\n"));
+global y = const_eval(return(13));
+global z = const_eval(13);
+global q = const_eval(print(:factorial(5), "\n"));
+global __c = const_eval(:factorial(5));
+global __f = const_eval(print("output will be assigned to variable f\n"));
+
+print(__c, "\n", __f);
+
+print((y equal_to z), " ", y, " ", z, "\n");
+
 print(:factorial(6), "\n", :fibonacci(11), "\n");
 
 exit();
